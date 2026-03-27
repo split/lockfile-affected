@@ -9,12 +9,17 @@ import {
 } from '@lockfile-affected/core';
 import { npmLockfileParser } from '@lockfile-affected/lockfile-npm';
 import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
+import { yarnLockfileParser } from '@lockfile-affected/lockfile-yarn';
 import type { CliOptions } from '../options/cli-options.types.js';
 import { toDependencyFilter } from '../options/to-dependency-filter.js';
 import { formatAffectedOutput } from '../output/format-affected-output.js';
 import { detectLockfile } from './detect-lockfile.js';
 
-const PARSERS: readonly LockfileParser[] = [pnpmLockfileParser, npmLockfileParser];
+const PARSERS: readonly LockfileParser[] = [
+  pnpmLockfileParser,
+  npmLockfileParser,
+  yarnLockfileParser,
+];
 
 const PARSERS_BY_FORMAT: ReadonlyMap<string, LockfileParser> = new Map(
   PARSERS.map((p) => [p.format, p]),

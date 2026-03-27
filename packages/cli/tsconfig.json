@@ -7,13 +7,15 @@
     "paths": {
       "@lockfile-affected/core": ["../core/src/index.ts"],
       "@lockfile-affected/lockfile-pnpm": ["../lockfile-pnpm/src/index.ts"],
-      "@lockfile-affected/lockfile-npm": ["../lockfile-npm/src/index.ts"]
+      "@lockfile-affected/lockfile-npm": ["../lockfile-npm/src/index.ts"],
+      "@lockfile-affected/lockfile-yarn": ["../lockfile-yarn/src/index.ts"]
     }
   },
   "include": ["src"],
   "references": [
     { "path": "../core" },
     { "path": "../lockfile-pnpm" },
-    { "path": "../lockfile-npm" }
+    { "path": "../lockfile-npm" },
+    { "path": "../lockfile-yarn" }
   ]
 }

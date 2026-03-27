@@ -4,6 +4,7 @@
     { "path": "packages/core" },
     { "path": "packages/lockfile-pnpm" },
     { "path": "packages/lockfile-npm" },
+    { "path": "packages/lockfile-yarn" },
     { "path": "packages/cli" }
   ]
 }

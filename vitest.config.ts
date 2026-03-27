@@ -6,6 +6,7 @@ export default defineConfig({
       'packages/core',
       'packages/lockfile-pnpm',
       'packages/lockfile-npm',
+      'packages/lockfile-yarn',
       'packages/cli',
     ],
     coverage: {

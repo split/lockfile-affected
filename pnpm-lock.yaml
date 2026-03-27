@@ -47,6 +47,9 @@ importers:
       '@lockfile-affected/lockfile-pnpm':
         specifier: workspace:*
         version: link:../lockfile-pnpm
+      '@lockfile-affected/lockfile-yarn':
+        specifier: workspace:*
+        version: link:../lockfile-yarn
     devDependencies:
       '@types/node':
         specifier: '*'
@@ -93,6 +96,25 @@ importers:
         version: 3.2.4(@types/node@22.19.15)
 
   packages/lockfile-pnpm:
+    dependencies:
+      '@lockfile-affected/core':
+        specifier: workspace:*
+        version: link:../core
+      lockparse:
+        specifier: ^0.5.0
+        version: 0.5.0
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: '*'
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+      typescript:
+        specifier: '*'
+        version: 5.9.3
+      vitest:
+        specifier: '*'
+        version: 3.2.4(@types/node@22.19.15)
+
+  packages/lockfile-yarn:
     dependencies:
       '@lockfile-affected/core':
         specifier: workspace:*

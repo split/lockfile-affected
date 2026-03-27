@@ -1,13 +1,14 @@
 {
   "name": "@lockfile-affected/lockfile-npm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "package-lock.json adapter for lockfile-affected",
   "type": "module",
   "engines": {
     "node": ">=18"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

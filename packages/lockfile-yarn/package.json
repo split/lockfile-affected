@@ -1,13 +1,14 @@
 {
   "name": "@lockfile-affected/lockfile-yarn",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "yarn.lock adapter for lockfile-affected",
   "type": "module",
   "engines": {
     "node": ">=18"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/lockfile-npm",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "package-lock.json adapter for lockfile-affected",
   "type": "module",
   "engines": {

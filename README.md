@@ -24,18 +24,15 @@ BASE=$(git merge-base HEAD origin/main)
 lockfile-affected <(git show $BASE:pnpm-lock.yaml) pnpm-lock.yaml
 ```
 
-Works with pnpm, npm, and yarn lockfiles.
+Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
 
-## Options
+See the [`lockfile-affected` package](https://www.npmjs.com/package/lockfile-affected)
+for the full list of options.
 
-```
---workspace <path>    Root directory to search for package.json files (defaults to cwd)
---format <pnpm|npm|yarn>  Lockfile format override (auto-detected by default)
---json                Output as a JSON array instead of newline-separated
---deps                Include production dependencies
---dev                 Include dev dependencies
---peer                Include peer dependencies
---optional            Include optional dependencies
-                      (when no dep flags are set, all types are included)
---help                Show help
-```
+## Packages
+
+- [`lockfile-affected`](packages/cli) — CLI
+- [`@lockfile-affected/core`](packages/core) — pure diff and resolution engine
+- [`@lockfile-affected/lockfile-pnpm`](packages/lockfile-pnpm) — pnpm-lock.yaml parser
+- [`@lockfile-affected/lockfile-npm`](packages/lockfile-npm) — package-lock.json parser
+- [`@lockfile-affected/lockfile-yarn`](packages/lockfile-yarn) — yarn.lock parser

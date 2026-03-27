@@ -1,0 +1,30 @@
+{
+  "name": "@lockfile-affected/lockfile-npm",
+  "version": "0.1.0",
+  "description": "package-lock.json adapter for lockfile-affected",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lockfile-affected/core": "workspace:*",
+    "lockparse": "^0.5.0"
+  },
+  "devDependencies": {
+    "vitest": "*",
+    "@vitest/coverage-v8": "*",
+    "typescript": "*"
+  }
+}

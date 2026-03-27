@@ -1,0 +1,26 @@
+{
+  "name": "@lockfile-affected/core",
+  "version": "0.1.0",
+  "description": "Core diff engine and affected package resolver",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "vitest": "*",
+    "@vitest/coverage-v8": "*",
+    "typescript": "*"
+  }
+}

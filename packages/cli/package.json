@@ -1,0 +1,35 @@
+{
+  "name": "lockfile-affected",
+  "version": "0.1.0",
+  "description": "CLI for identifying affected monorepo packages from lockfile changes",
+  "type": "module",
+  "bin": {
+    "lockfile-affected": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lockfile-affected/core": "workspace:*",
+    "@lockfile-affected/lockfile-npm": "workspace:*",
+    "@lockfile-affected/lockfile-pnpm": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "*",
+    "@vitest/coverage-v8": "*",
+    "@types/node": "*",
+    "typescript": "*"
+  }
+}

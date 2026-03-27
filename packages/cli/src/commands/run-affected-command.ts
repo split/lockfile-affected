@@ -1,4 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
+import { readLockfileContent } from './read-lockfile-content.js';
 import { join } from 'node:path';
 import {
   buildWorkspaceGraph,
@@ -40,8 +41,8 @@ export async function runAffectedCommand(options: CliOptions): Promise<string> {
   if (!parser) throw new Error(`No parser registered for format: ${format}`);
 
   const [beforeContent, afterContent] = await Promise.all([
-    readFile(options.lockfileBefore, 'utf-8'),
-    readFile(options.lockfileAfter, 'utf-8'),
+    readLockfileContent(options.lockfileBefore),
+    readLockfileContent(options.lockfileAfter),
   ]);
 
   const [snapshotBefore, snapshotAfter] = await Promise.all([

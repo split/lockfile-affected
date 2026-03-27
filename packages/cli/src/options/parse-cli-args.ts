@@ -3,6 +3,8 @@ import type { CliOptions, OutputFormat } from './cli-options.types.js';
 export const HELP_TEXT = `\
 Usage: lockfile-affected <before-lockfile> <after-lockfile> [options]
 
+  Use '-' as <before-lockfile> to read from stdin.
+
 Options:
   --workspace <path>    Root directory to search for package.json files
                         (defaults to cwd)

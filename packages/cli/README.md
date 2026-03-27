@@ -24,6 +24,12 @@ BASE=$(git merge-base HEAD origin/main)
 lockfile-affected <(git show $BASE:pnpm-lock.yaml) pnpm-lock.yaml
 ```
 
+Or pipe the before snapshot via stdin using `-` (works with `npx`):
+
+```sh
+git show origin/main:pnpm-lock.yaml | npx lockfile-affected - pnpm-lock.yaml
+```
+
 Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
 
 ## Options

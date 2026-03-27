@@ -1,6 +1,6 @@
 {
   "name": "lockfile-affected",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "CLI for identifying affected monorepo packages from lockfile changes",
   "type": "module",
   "engines": {

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Core diff engine and affected package resolver",
   "type": "module",
+  "engines": { "node": ">=18" },
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

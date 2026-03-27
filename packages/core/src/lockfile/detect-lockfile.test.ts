@@ -2,8 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { LockfileParser, LockfileSnapshot } from '@lockfile-affected/core';
+import { beforeEach, describe, expect, it } from 'vitest';
+import type { LockfileParser, LockfileSnapshot } from '../types/lockfile.js';
 import { detectLockfile } from './detect-lockfile.js';
 
 function makeTempDir(): string {

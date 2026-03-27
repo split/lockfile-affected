@@ -1,6 +1,6 @@
 import { access } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { LockfileParser } from '@lockfile-affected/core';
+import type { LockfileParser } from '../types/lockfile.js';
 
 export type DetectedLockfile = {
   readonly path: string;

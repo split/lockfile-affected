@@ -46,32 +46,9 @@ Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
 --help                     Show help
 ```
 
-## How it works
-
-1. Parses both lockfile snapshots into a normalized `name → version` map
-2. Diffs the two snapshots (added, removed, changed packages)
-3. Walks all `package.json` files under `--workspace` to build a dependency graph
-4. Returns the names of workspace packages that depend on any changed dependency
-
-## Programmatic use
-
-The orchestration logic is also exported for use in custom tooling:
-
-```ts
-import { runAffectedCommand } from 'lockfile-affected';
-
-const output = await runAffectedCommand({
-  lockfileBefore: '/path/to/old/pnpm-lock.yaml',
-  lockfileAfter: '/path/to/new/pnpm-lock.yaml',
-  workspaceRoot: process.cwd(),
-  output: 'lines', // or 'json'
-});
-console.log(output);
-```
-
 ## Related packages
 
-- [`@lockfile-affected/core`](https://www.npmjs.com/package/@lockfile-affected/core) — pure diff and resolution engine
+- [`@lockfile-affected/core`](https://www.npmjs.com/package/@lockfile-affected/core) — programmatic API, pure diff and resolution engine
 - [`@lockfile-affected/lockfile-pnpm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-pnpm) — pnpm-lock.yaml parser
 - [`@lockfile-affected/lockfile-npm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-npm) — package-lock.json parser
 - [`@lockfile-affected/lockfile-yarn`](https://www.npmjs.com/package/@lockfile-affected/lockfile-yarn) — yarn.lock parser

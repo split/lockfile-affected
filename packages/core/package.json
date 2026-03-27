@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/core",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Core diff engine and affected package resolver",
   "type": "module",
   "engines": {
@@ -31,6 +31,7 @@
   "devDependencies": {
     "vitest": "*",
     "@vitest/coverage-v8": "*",
+    "@types/node": "*",
     "typescript": "*"
   }
 }

@@ -1,9 +1,6 @@
 # @lockfile-affected/core
 
-Pure diff engine and affected-package resolver for `lockfile-affected`.
-
-This package contains all domain logic with no I/O. It is format-agnostic —
-lockfile parsers live in separate adapter packages.
+Diff engine, affected-package resolver, and programmatic API for `lockfile-affected`.
 
 ## Installation
 
@@ -11,11 +8,58 @@ lockfile parsers live in separate adapter packages.
 npm install @lockfile-affected/core
 ```
 
-## API
+## Programmatic API
+
+### `findAffectedPackages(options)` — high-level entry point
+
+Parses two lockfile snapshots, diffs them, loads workspace manifests from disk,
+and returns the names of affected packages. This is the primary API for
+programmatic use.
+
+```ts
+import { findAffectedPackages } from '@lockfile-affected/core';
+import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
+
+const affected = await findAffectedPackages({
+  beforeContent: fs.readFileSync('pnpm-lock.yaml.old', 'utf-8'),
+  afterContent: fs.readFileSync('pnpm-lock.yaml', 'utf-8'),
+  parser: pnpmLockfileParser,
+  workspaceRoot: process.cwd(),
+  // filter: { dependencies: true, devDependencies: true } — optional
+});
+// ReadonlySet<string> of affected package names
+```
+
+### `detectLockfile(dir, parsers)`
+
+Finds the first known lockfile in `dir` by checking each parser's `lockfileNames`.
+
+```ts
+import { detectLockfile } from '@lockfile-affected/core';
+import { pnpmLockfileParser, npmLockfileParser } from '...';
+
+const { format, path } = await detectLockfile(process.cwd(), [
+  pnpmLockfileParser,
+  npmLockfileParser,
+]);
+```
+
+### `loadWorkspaceManifests(dir)`
+
+Recursively walks `dir` and returns all valid `package.json` manifests,
+skipping `node_modules` and malformed files.
+
+```ts
+import { loadWorkspaceManifests } from '@lockfile-affected/core';
+
+const manifests = await loadWorkspaceManifests(process.cwd());
+```
+
+## Low-level API
+
+These primitives are useful for building custom pipelines.
 
 ### `diffLockfileSnapshots(before, after)`
-
-Compares two lockfile snapshots and returns what changed.
 
 ```ts
 import { diffLockfileSnapshots } from '@lockfile-affected/core';
@@ -28,31 +72,14 @@ const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
 
 ### `resolveAffectedPackages(diff, workspaceGraph, filter?)`
 
-Returns the names of workspace packages that depend on any package in the diff.
-
 ```ts
 import { resolveAffectedPackages, ALL_DEPENDENCY_TYPES } from '@lockfile-affected/core';
 
 const affected = resolveAffectedPackages(diff, workspaceGraph, ALL_DEPENDENCY_TYPES);
-// Set<string> of affected package names
-```
-
-The optional `filter` is a `DependencyFilter` controlling which dependency types
-are considered. Omitting a field (or setting it to `false`) excludes that type.
-When omitted entirely, all types are included.
-
-```ts
-type DependencyFilter = {
-  dependencies?: boolean;
-  devDependencies?: boolean;
-  peerDependencies?: boolean;
-  optionalDependencies?: boolean;
-};
+// ReadonlySet<string> of affected package names
 ```
 
 ### `buildWorkspaceGraph(manifests)`
-
-Builds a workspace graph from an array of parsed `package.json` objects.
 
 ```ts
 import { buildWorkspaceGraph } from '@lockfile-affected/core';
@@ -64,18 +91,25 @@ const graph = buildWorkspaceGraph(manifests);
 ## Types
 
 ```ts
-type LockfileSnapshot = ReadonlyMap<string, string>;
-
-type LockfileDiff = {
-  added: ReadonlyMap<string, string>;
-  removed: ReadonlyMap<string, string>;
-  changed: ReadonlyMap<string, { from: string; to: string }>;
+type DependencyFilter = {
+  dependencies?: boolean;
+  devDependencies?: boolean;
+  peerDependencies?: boolean;
+  optionalDependencies?: boolean;
 };
 
 type LockfileParser = {
   format: string;
   lockfileNames: readonly string[];
   parse: (content: string) => Promise<LockfileSnapshot>;
+};
+
+type LockfileSnapshot = ReadonlyMap<string, string>;
+
+type LockfileDiff = {
+  added: ReadonlyMap<string, string>;
+  removed: ReadonlyMap<string, string>;
+  changed: ReadonlyMap<string, { from: string; to: string }>;
 };
 ```
 

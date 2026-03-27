@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "description": "pnpm-lock.yaml adapter for lockfile-affected",
   "type": "module",
-  "engines": { "node": ">=18" },
-  "files": ["dist"],
-  "publishConfig": { "access": "public" },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

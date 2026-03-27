@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "description": "CLI for identifying affected monorepo packages from lockfile changes",
   "type": "module",
-  "engines": { "node": ">=18" },
-  "files": ["dist"],
-  "publishConfig": { "access": "public" },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "lockfile-affected": "./dist/bin.js"
   },

@@ -3,10 +3,11 @@
 - Name files after what they do: `parse-pnpm-lockfile.ts`, `resolve-affected-packages.ts`
 - No force casts (`as Foo`) — use type guards and narrowing
 - Imports require `.js` extensions (NodeNext module resolution)
+- Conventional commits for commit messages
 
 ## Architecture
 Vertical slice — one package per concern:
-- `@lockfile-affected/core` — pure domain logic, no I/O
+- `@lockfile-affected/core` — pure domain logic, cli and adapter agnostic
 - `@lockfile-affected/lockfile-*` — one package per lockfile format
 - `@lockfile-affected/cli` — I/O boundary, orchestration
 

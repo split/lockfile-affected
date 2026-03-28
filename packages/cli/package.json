@@ -2,6 +2,11 @@
   "name": "lockfile-affected",
   "version": "0.1.4",
   "description": "CLI for identifying affected monorepo packages from lockfile changes",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/split/lockfile-affected"
+  },
   "type": "module",
   "engines": {
     "node": ">=18"

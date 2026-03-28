@@ -41,5 +41,8 @@
     "vitest": "*",
     "@vitest/coverage-v8": "*",
     "typescript": "*"
+  },
+  "release": {
+    "extends": "semantic-release-monorepo"
   }
 }

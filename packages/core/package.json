@@ -38,8 +38,5 @@
     "@vitest/coverage-v8": "*",
     "@types/node": "*",
     "typescript": "*"
-  },
-  "release": {
-    "extends": "../../release.config.ts"
   }
 }

@@ -12,9 +12,9 @@ export async function readLockfileContent(pathOrDash: string): Promise<string> {
 }
 
 async function readStdin(): Promise<string> {
-  const chunks: Buffer[] = [];
+  const chunks: string[] = [];
   for await (const chunk of process.stdin) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    chunks.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString('utf-8'));
   }
-  return Buffer.concat(chunks).toString('utf-8');
+  return chunks.join('');
 }

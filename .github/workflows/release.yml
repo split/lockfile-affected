@@ -43,4 +43,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm -r --filter "./packages/*" --workspace-concurrency=1 exec semantic-release --extends "$GITHUB_WORKSPACE/release.config.ts"
+        run: pnpm -r --filter "./packages/*" --workspace-concurrency=1 exec semantic-release --extends "$GITHUB_WORKSPACE/release.config.js"

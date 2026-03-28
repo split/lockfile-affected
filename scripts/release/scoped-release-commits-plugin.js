@@ -1,5 +1,4 @@
 import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
-import type { LockfileParser } from '@lockfile-affected/core';
 import { npmLockfileParser } from '@lockfile-affected/lockfile-npm';
 import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
 import { yarnLockfileParser } from '@lockfile-affected/lockfile-yarn';
@@ -9,48 +8,32 @@ import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-const parsersMap: Record<string, LockfileParser> = {
+const parsersMap = {
   pnpm: pnpmLockfileParser,
   npm: npmLockfileParser,
   yarn: yarnLockfileParser,
 };
 
-interface Logger {
-  log: (message: string) => void;
-}
+const scopedCommitsCache = new Map();
 
-interface ReleaseContext {
-  cwd: string;
-  logger: Logger;
-  commits?: unknown[];
-  lastRelease?: { gitTag?: string };
-  nextRelease?: unknown;
-}
-
-interface CommitRecord {
-  hash: string;
-}
-
-const scopedCommitsCache = new Map<string, Promise<unknown[]>>();
-
-function isRecord(value: unknown): value is Record<string, unknown> {
+function isRecord(value) {
   return typeof value === 'object' && value !== null;
 }
 
-function isCommitRecord(value: unknown): value is CommitRecord {
+function isCommitRecord(value) {
   if (!isRecord(value)) return false;
   return typeof value.hash === 'string' && value.hash.length > 0;
 }
 
-export function readPackageName(cwd: string): string {
+export function readPackageName(cwd) {
   const pkgRaw = fs.readFileSync(path.join(cwd, 'package.json'), 'utf-8');
-  const parsed: unknown = JSON.parse(pkgRaw);
+  const parsed = JSON.parse(pkgRaw);
 
   if (!isRecord(parsed)) {
     throw new Error(`Invalid package.json in ${cwd}`);
   }
 
-  const name = parsed.name;
+  const { name } = parsed;
   if (typeof name !== 'string' || name.length === 0) {
     throw new Error(`Missing package name in ${cwd}`);
   }
@@ -58,18 +41,18 @@ export function readPackageName(cwd: string): string {
   return name;
 }
 
-function toGitPath(filePath: string): string {
+function toGitPath(filePath) {
   return filePath.split(path.sep).join('/');
 }
 
-function getGitRoot(cwd: string): string {
+function getGitRoot(cwd) {
   return execFileSync('git', ['rev-parse', '--show-toplevel'], {
     cwd,
     encoding: 'utf-8',
   }).trim();
 }
 
-function getChangedFiles(cwd: string, commitHash: string): string[] {
+function getChangedFiles(cwd, commitHash) {
   const output = execFileSync('git', ['show', '--pretty=format:', '--name-only', commitHash], {
     cwd,
     encoding: 'utf-8',
@@ -81,7 +64,7 @@ function getChangedFiles(cwd: string, commitHash: string): string[] {
     .filter((line) => line.length > 0);
 }
 
-function readTextAtRef(cwd: string, gitRef: string, filePath: string): string | undefined {
+function readTextAtRef(cwd, gitRef, filePath) {
   try {
     return execFileSync('git', ['show', `${gitRef}:${filePath}`], {
       cwd,
@@ -92,17 +75,12 @@ function readTextAtRef(cwd: string, gitRef: string, filePath: string): string | 
   }
 }
 
-async function affectedPackagesForLockfileCommit(
-  gitRoot: string,
-  commitHash: string,
-  lockfilePath: string,
-  parser: LockfileParser,
-): Promise<Set<string>> {
+async function affectedPackagesForLockfileCommit(gitRoot, commitHash, lockfilePath, parser) {
   const beforeContent = readTextAtRef(gitRoot, `${commitHash}^`, lockfilePath);
   const afterContent = readTextAtRef(gitRoot, commitHash, lockfilePath);
 
   if (!beforeContent || !afterContent) {
-    return new Set<string>();
+    return new Set();
   }
 
   const affected = await findAffectedPackages({
@@ -115,7 +93,7 @@ async function affectedPackagesForLockfileCommit(
   return new Set(affected);
 }
 
-async function scopeCommitsForPackage(context: ReleaseContext): Promise<unknown[]> {
+async function scopeCommitsForPackage(context) {
   const commits = Array.isArray(context.commits) ? context.commits : [];
   const validCommits = commits.filter(isCommitRecord);
 
@@ -127,8 +105,8 @@ async function scopeCommitsForPackage(context: ReleaseContext): Promise<unknown[
   const packagePath = toGitPath(path.relative(gitRoot, context.cwd));
   const packageName = readPackageName(context.cwd);
 
-  const changedFilesCache = new Map<string, string[]>();
-  const filesFor = (hash: string): string[] => {
+  const changedFilesCache = new Map();
+  const filesFor = (hash) => {
     const cached = changedFilesCache.get(hash);
     if (cached) return cached;
 
@@ -137,7 +115,7 @@ async function scopeCommitsForPackage(context: ReleaseContext): Promise<unknown[
     return files;
   };
 
-  const packageCommitHashes = new Set<string>();
+  const packageCommitHashes = new Set();
   for (const commit of validCommits) {
     const files = filesFor(commit.hash);
     const touchesPackage = files.some(
@@ -165,8 +143,8 @@ async function scopeCommitsForPackage(context: ReleaseContext): Promise<unknown[
 
   const parser = parsersMap[detectedLockfile.format];
   const lockfilePath = toGitPath(path.relative(gitRoot, detectedLockfile.path));
-  const lockfileAffectedHashes = new Set<string>();
-  const affectedByCommitCache = new Map<string, Set<string>>();
+  const lockfileAffectedHashes = new Set();
+  const affectedByCommitCache = new Map();
 
   for (const commit of validCommits) {
     const files = filesFor(commit.hash);
@@ -188,7 +166,7 @@ async function scopeCommitsForPackage(context: ReleaseContext): Promise<unknown[
     }
   }
 
-  const includedHashes = new Set<string>([...packageCommitHashes, ...lockfileAffectedHashes]);
+  const includedHashes = new Set([...packageCommitHashes, ...lockfileAffectedHashes]);
   const lockfileHashList = [...lockfileAffectedHashes].map((hash) => hash.slice(0, 7)).join(', ');
   context.logger.log(
     `Scoped ${includedHashes.size} commits for ${packageName} (${packageCommitHashes.size} package, ${lockfileAffectedHashes.size} lockfile-impact)`,
@@ -200,7 +178,7 @@ async function scopeCommitsForPackage(context: ReleaseContext): Promise<unknown[
   return commits.filter((commit) => isCommitRecord(commit) && includedHashes.has(commit.hash));
 }
 
-function getScopedCacheKey(context: ReleaseContext): string {
+function getScopedCacheKey(context) {
   const commits = Array.isArray(context.commits) ? context.commits : [];
   const hashes = commits
     .filter(isCommitRecord)
@@ -209,7 +187,7 @@ function getScopedCacheKey(context: ReleaseContext): string {
   return `${context.cwd}|${context.lastRelease?.gitTag ?? 'none'}|${hashes}`;
 }
 
-function getScopedCommits(context: ReleaseContext): Promise<unknown[]> {
+function getScopedCommits(context) {
   const key = getScopedCacheKey(context);
   const cached = scopedCommitsCache.get(key);
   if (cached) {
@@ -223,10 +201,7 @@ function getScopedCommits(context: ReleaseContext): Promise<unknown[]> {
 
 export function createScopedReleaseCommitsPlugin() {
   return {
-    analyzeCommits: async (
-      pluginConfig: Parameters<typeof commitAnalyzer.analyzeCommits>[0],
-      context: ReleaseContext,
-    ) => {
+    analyzeCommits: async (pluginConfig, context) => {
       const scopedCommits = await getScopedCommits(context);
       const scopedContext = {
         ...context,
@@ -235,10 +210,7 @@ export function createScopedReleaseCommitsPlugin() {
 
       return commitAnalyzer.analyzeCommits(pluginConfig, scopedContext);
     },
-    generateNotes: async (
-      pluginConfig: Parameters<typeof releaseNotesGenerator.generateNotes>[0],
-      context: ReleaseContext,
-    ) => {
+    generateNotes: async (pluginConfig, context) => {
       const scopedCommits = await getScopedCommits(context);
       const scopedContext = {
         ...context,

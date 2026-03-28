@@ -49,6 +49,6 @@
     "typescript": "*"
   },
   "release": {
-    "extends": "semantic-release-monorepo"
+    "extends": "../../release.config.ts"
   }
 }

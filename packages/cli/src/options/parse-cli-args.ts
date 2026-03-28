@@ -1,4 +1,5 @@
 import type { CliOptions, OutputFormat } from './cli-options.types.js';
+import { isSupportedFormat, supportedFormats, type SupportedFormat } from '../lockfile/parsers.js';
 
 export const helpText = `\
 Usage: lockfile-affected <before-lockfile> <after-lockfile> [options]
@@ -8,7 +9,7 @@ Usage: lockfile-affected <before-lockfile> <after-lockfile> [options]
 Options:
   --workspace <path>    Root directory to search for package.json files
                         (defaults to cwd)
-  --format <pnpm|npm>   Lockfile format override (auto-detected from filename)
+  --format <pnpm|npm|yarn> Lockfile format override (auto-detected from filename)
   --json                Output as a JSON array instead of newline-separated
   --deps                Include production dependencies
   --dev                 Include dev dependencies
@@ -17,9 +18,6 @@ Options:
                         (when no dep flags are set, all types are included)
   --help                Show this help message
 `;
-
-const supportedFormats = ['pnpm', 'npm'] as const;
-type SupportedFormat = (typeof supportedFormats)[number];
 
 export type ParseCliArgsResult = { kind: 'help' } | { kind: 'options'; options: CliOptions };
 
@@ -92,10 +90,6 @@ export function parseCliArgs(args: readonly string[]): ParseCliArgsResult {
       optional,
     },
   };
-}
-
-function isSupportedFormat(value: string): value is SupportedFormat {
-  return (supportedFormats as readonly string[]).includes(value);
 }
 
 function atLeastTwo<T>(arr: T[]): [T, T, ...T[]] | undefined {

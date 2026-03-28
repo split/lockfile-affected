@@ -1,3 +1,5 @@
+import type { SupportedFormat } from '../lockfile/parsers.js';
+
 export type OutputFormat = 'lines' | 'json';
 
 /**
@@ -13,7 +15,7 @@ export type CliOptions = {
   /** Output format */
   readonly output: OutputFormat;
   /** Lockfile format — auto-inferred from filename when absent */
-  readonly format?: 'pnpm' | 'npm';
+  readonly format?: SupportedFormat;
   /**
    * Which dependency types to consider. When none are explicitly set,
    * all types are included by default.

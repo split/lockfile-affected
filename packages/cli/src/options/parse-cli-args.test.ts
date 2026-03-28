@@ -67,8 +67,12 @@ describe('parseCliArgs', () => {
       expect(opts(['before.lock', 'after.lock', '--format', 'npm']).format).toBe('npm');
     });
 
+    it('supports yarn format override', () => {
+      expect(opts(['before.lock', 'after.lock', '--format', 'yarn']).format).toBe('yarn');
+    });
+
     it('throws when an unsupported format is given', () => {
-      expect(() => parseCliArgs(['a.lock', 'b.lock', '--format', 'yarn'])).toThrow();
+      expect(() => parseCliArgs(['a.lock', 'b.lock', '--format', 'not-a-format'])).toThrow();
     });
 
     it('defaults all dep type flags to false', () => {

@@ -1,21 +1,13 @@
-import { detectLockfile, findAffectedPackages, type LockfileParser } from '@lockfile-affected/core';
-import { npmLockfileParser } from '@lockfile-affected/lockfile-npm';
-import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
-import { yarnLockfileParser } from '@lockfile-affected/lockfile-yarn';
+import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
+import {
+  isSupportedFormat,
+  lockfileParsers,
+  lockfileParsersByFormat,
+} from '../lockfile/parsers.js';
 import type { CliOptions } from '../options/cli-options.types.js';
 import { toDependencyFilter } from '../options/to-dependency-filter.js';
 import { formatAffectedOutput } from '../output/format-affected-output.js';
 import { readLockfileContent } from './read-lockfile-content.js';
-
-const parsers: readonly LockfileParser[] = [
-  pnpmLockfileParser,
-  npmLockfileParser,
-  yarnLockfileParser,
-];
-
-const parsersByFormat: ReadonlyMap<string, LockfileParser> = new Map(
-  parsers.map((p) => [p.format, p]),
-);
 
 /**
  * Runs the full affected-packages resolution pipeline:
@@ -25,10 +17,14 @@ const parsersByFormat: ReadonlyMap<string, LockfileParser> = new Map(
  * 4. Format and return output
  */
 export async function runAffectedCommand(options: CliOptions): Promise<string> {
-  const format = options.format ?? (await detectLockfile(options.workspaceRoot, parsers)).format;
+  const format =
+    options.format ?? (await detectLockfile(options.workspaceRoot, lockfileParsers)).format;
 
-  const parser = parsersByFormat.get(format);
-  if (!parser) throw new Error(`No parser registered for format: ${format}`);
+  if (!isSupportedFormat(format)) {
+    throw new Error(`No parser registered for format: ${format}`);
+  }
+
+  const parser = lockfileParsersByFormat[format];
 
   const [beforeContent, afterContent] = await Promise.all([
     readLockfileContent(options.lockfileBefore),

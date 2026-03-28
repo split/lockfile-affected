@@ -16,7 +16,8 @@
     "README.md"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "bin": {
     "lockfile-affected": "./dist/bin.js"

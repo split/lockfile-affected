@@ -1,8 +1,13 @@
 # lockfile-affected
 
+[![CI](https://github.com/split/lockfile-affected/actions/workflows/ci.yml/badge.svg)](https://github.com/split/lockfile-affected/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/lockfile-affected)](https://www.npmjs.com/package/lockfile-affected)
+
 Find which workspace packages are affected by lockfile changes.
 
 ## Installation
+
+Install globally when you want a persistent `lockfile-affected` command:
 
 ```sh
 npm install -g lockfile-affected
@@ -10,24 +15,24 @@ npm install -g lockfile-affected
 pnpm add -g lockfile-affected
 ```
 
-## Usage
-
-Pass the before and after lockfile snapshots as arguments. Use shell process
-substitution to avoid temp files:
+Install in a repository:
 
 ```sh
-# Compare against a specific branch
-lockfile-affected <(git show origin/main:pnpm-lock.yaml) pnpm-lock.yaml
+pnpm add -D lockfile-affected
+```
 
-# Compare against the merge base (typical CI usage)
-BASE=$(git merge-base HEAD origin/main)
-lockfile-affected <(git show $BASE:pnpm-lock.yaml) pnpm-lock.yaml
+## Usage
+
+Pass the before and after lockfile snapshots as arguments:
+
+```sh
+lockfile-affected pnpm-lock.yaml.old pnpm-lock.yaml
 ```
 
 Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
 
-See the [`lockfile-affected` package](https://www.npmjs.com/package/lockfile-affected)
-for the full list of options.
+For full Git and CI usage patterns, see the CLI guide:
+[`packages/cli/README.md`](packages/cli/README.md).
 
 ## Packages
 

@@ -10,7 +10,7 @@ npm install @lockfile-affected/core
 
 ## Programmatic API
 
-### `findAffectedPackages(options)` — high-level entry point
+### `findAffectedPackages(options)` - high-level entry point
 
 Parses two lockfile snapshots, diffs them, loads workspace manifests from disk,
 and returns the names of affected packages. This is the primary API for
@@ -25,7 +25,7 @@ const affected = await findAffectedPackages({
   afterContent: fs.readFileSync('pnpm-lock.yaml', 'utf-8'),
   parser: pnpmLockfileParser,
   workspaceRoot: process.cwd(),
-  // filter: { dependencies: true, devDependencies: true } — optional
+  // filter: { dependencies: true, devDependencies: true } - optional
 });
 // ReadonlySet<string> of affected package names
 ```
@@ -36,11 +36,12 @@ Finds the first known lockfile in `dir` by checking each parser's `lockfileNames
 
 ```ts
 import { detectLockfile } from '@lockfile-affected/core';
-import { pnpmLockfileParser, npmLockfileParser } from '...';
+import { pnpmLockfileParser, npmLockfileParser, yarnLockfileParser } from '...';
 
 const { format, path } = await detectLockfile(process.cwd(), [
   pnpmLockfileParser,
   npmLockfileParser,
+  yarnLockfileParser,
 ]);
 ```
 
@@ -65,9 +66,9 @@ These primitives are useful for building custom pipelines.
 import { diffLockfileSnapshots } from '@lockfile-affected/core';
 
 const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
-// diff.added   — Map<name, newVersion>
-// diff.removed — Map<name, oldVersion>
-// diff.changed — Map<name, { from, to }>
+// diff.added   - Map<name, newVersion>
+// diff.removed - Map<name, oldVersion>
+// diff.changed - Map<name, { from, to }>
 ```
 
 ### `resolveAffectedPackages(diff, workspaceGraph, filter?)`
@@ -113,9 +114,5 @@ type LockfileDiff = {
 };
 ```
 
-## Related packages
-
-- [`lockfile-affected`](https://www.npmjs.com/package/lockfile-affected) — CLI
-- [`@lockfile-affected/lockfile-pnpm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-pnpm) — pnpm adapter
-- [`@lockfile-affected/lockfile-npm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-npm) — npm adapter
-- [`@lockfile-affected/lockfile-yarn`](https://www.npmjs.com/package/@lockfile-affected/lockfile-yarn) — yarn adapter
+For Git-based and CI usage patterns, see the CLI guide:
+`https://github.com/split/lockfile-affected/tree/main/packages/cli#readme`.

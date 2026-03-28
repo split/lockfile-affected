@@ -1,6 +1,6 @@
 import type { CliOptions, OutputFormat } from './cli-options.types.js';
 
-export const HELP_TEXT = `\
+export const helpText = `\
 Usage: lockfile-affected <before-lockfile> <after-lockfile> [options]
 
   Use '-' as <before-lockfile> to read from stdin.
@@ -18,8 +18,8 @@ Options:
   --help                Show this help message
 `;
 
-const SUPPORTED_FORMATS = ['pnpm', 'npm'] as const;
-type SupportedFormat = (typeof SUPPORTED_FORMATS)[number];
+const supportedFormats = ['pnpm', 'npm'] as const;
+type SupportedFormat = (typeof supportedFormats)[number];
 
 export type ParseCliArgsResult = { kind: 'help' } | { kind: 'options'; options: CliOptions };
 
@@ -61,7 +61,7 @@ export function parseCliArgs(args: readonly string[]): ParseCliArgsResult {
       if (done || !value) throw new Error('--format requires a value');
       if (!isSupportedFormat(value)) {
         throw new Error(
-          `Unsupported format "${value}". Supported formats: ${SUPPORTED_FORMATS.join(', ')}`,
+          `Unsupported format "${value}". Supported formats: ${supportedFormats.join(', ')}`,
         );
       }
       format = value;
@@ -95,7 +95,7 @@ export function parseCliArgs(args: readonly string[]): ParseCliArgsResult {
 }
 
 function isSupportedFormat(value: string): value is SupportedFormat {
-  return (SUPPORTED_FORMATS as readonly string[]).includes(value);
+  return (supportedFormats as readonly string[]).includes(value);
 }
 
 function atLeastTwo<T>(arr: T[]): [T, T, ...T[]] | undefined {

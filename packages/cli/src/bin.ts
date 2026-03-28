@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { HELP_TEXT, parseCliArgs } from './options/parse-cli-args.js';
+import { helpText, parseCliArgs } from './options/parse-cli-args.js';
 import { runAffectedCommand } from './commands/run-affected-command.js';
 
 const args = process.argv.slice(2);
 const result = parseCliArgs(args);
 
 if (result.kind === 'help') {
-  process.stdout.write(HELP_TEXT);
+  process.stdout.write(helpText);
   process.exit(0);
 }
 

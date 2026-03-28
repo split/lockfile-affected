@@ -7,14 +7,14 @@ import { toDependencyFilter } from '../options/to-dependency-filter.js';
 import { formatAffectedOutput } from '../output/format-affected-output.js';
 import { readLockfileContent } from './read-lockfile-content.js';
 
-const PARSERS: readonly LockfileParser[] = [
+const parsers: readonly LockfileParser[] = [
   pnpmLockfileParser,
   npmLockfileParser,
   yarnLockfileParser,
 ];
 
-const PARSERS_BY_FORMAT: ReadonlyMap<string, LockfileParser> = new Map(
-  PARSERS.map((p) => [p.format, p]),
+const parsersByFormat: ReadonlyMap<string, LockfileParser> = new Map(
+  parsers.map((p) => [p.format, p]),
 );
 
 /**
@@ -25,9 +25,9 @@ const PARSERS_BY_FORMAT: ReadonlyMap<string, LockfileParser> = new Map(
  * 4. Format and return output
  */
 export async function runAffectedCommand(options: CliOptions): Promise<string> {
-  const format = options.format ?? (await detectLockfile(options.workspaceRoot, PARSERS)).format;
+  const format = options.format ?? (await detectLockfile(options.workspaceRoot, parsers)).format;
 
-  const parser = PARSERS_BY_FORMAT.get(format);
+  const parser = parsersByFormat.get(format);
   if (!parser) throw new Error(`No parser registered for format: ${format}`);
 
   const [beforeContent, afterContent] = await Promise.all([

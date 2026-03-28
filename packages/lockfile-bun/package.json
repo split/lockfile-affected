@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/lockfile-bun",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "bun.lock adapter for lockfile-affected",
   "license": "MIT",
   "repository": {

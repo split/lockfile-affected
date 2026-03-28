@@ -1,4 +1,5 @@
 import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
+import { bunLockfileParser } from '@lockfile-affected/lockfile-bun';
 import { npmLockfileParser } from '@lockfile-affected/lockfile-npm';
 import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
 import { yarnLockfileParser } from '@lockfile-affected/lockfile-yarn';
@@ -12,6 +13,7 @@ const parsersMap = {
   pnpm: pnpmLockfileParser,
   npm: npmLockfileParser,
   yarn: yarnLockfileParser,
+  bun: bunLockfileParser,
 };
 
 const scopedCommitsCache = new Map();

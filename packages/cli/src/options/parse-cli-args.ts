@@ -9,7 +9,7 @@ Usage: lockfile-affected <before-lockfile> <after-lockfile> [options]
 Options:
   --workspace <path>    Root directory to search for package.json files
                         (defaults to cwd)
-  --format <pnpm|npm|yarn> Lockfile format override (auto-detected from filename)
+  --format <pnpm|npm|yarn|bun> Lockfile format override (auto-detected from filename)
   --json                Output as a JSON array instead of newline-separated
   --deps                Include production dependencies
   --dev                 Include dev dependencies

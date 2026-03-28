@@ -14,6 +14,9 @@ importers:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:packages/core
+      '@lockfile-affected/lockfile-bun':
+        specifier: workspace:*
+        version: link:packages/lockfile-bun
       '@lockfile-affected/lockfile-npm':
         specifier: workspace:*
         version: link:packages/lockfile-npm
@@ -71,6 +74,9 @@ importers:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:../core
+      '@lockfile-affected/lockfile-bun':
+        specifier: workspace:*
+        version: link:../lockfile-bun
       '@lockfile-affected/lockfile-npm':
         specifier: workspace:*
         version: link:../lockfile-npm
@@ -99,6 +105,25 @@ importers:
       '@types/node':
         specifier: '*'
         version: 22.19.15
+      '@vitest/coverage-v8':
+        specifier: '*'
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+      typescript:
+        specifier: '*'
+        version: 5.9.3
+      vitest:
+        specifier: '*'
+        version: 3.2.4(@types/node@22.19.15)
+
+  packages/lockfile-bun:
+    dependencies:
+      '@lockfile-affected/core':
+        specifier: workspace:*
+        version: link:../core
+      lockparse:
+        specifier: ^0.5.0
+        version: 0.5.0
+    devDependencies:
       '@vitest/coverage-v8':
         specifier: '*'
         version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))

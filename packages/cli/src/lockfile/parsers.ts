@@ -1,3 +1,4 @@
+import { bunLockfileParser } from '@lockfile-affected/lockfile-bun';
 import type { LockfileParser } from '@lockfile-affected/core';
 import { npmLockfileParser } from '@lockfile-affected/lockfile-npm';
 import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
@@ -7,6 +8,7 @@ export const lockfileParsersByFormat = {
   pnpm: pnpmLockfileParser,
   npm: npmLockfileParser,
   yarn: yarnLockfileParser,
+  bun: bunLockfileParser,
 } satisfies Record<string, LockfileParser>;
 
 export type SupportedFormat = keyof typeof lockfileParsersByFormat;

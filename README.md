@@ -29,7 +29,7 @@ Pass the before and after lockfile snapshots as arguments:
 lockfile-affected pnpm-lock.yaml.old pnpm-lock.yaml
 ```
 
-Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
+Works with pnpm, npm, yarn (classic v1 and berry v2+), and Bun text lockfiles (`bun.lock`).
 
 For full Git and CI usage patterns, see the CLI guide:
 [`packages/cli/README.md`](packages/cli/README.md).
@@ -41,3 +41,4 @@ For full Git and CI usage patterns, see the CLI guide:
 - [`@lockfile-affected/lockfile-pnpm`](packages/lockfile-pnpm) — pnpm-lock.yaml parser
 - [`@lockfile-affected/lockfile-npm`](packages/lockfile-npm) — package-lock.json parser
 - [`@lockfile-affected/lockfile-yarn`](packages/lockfile-yarn) — yarn.lock parser
+- [`@lockfile-affected/lockfile-bun`](packages/lockfile-bun) — bun.lock parser

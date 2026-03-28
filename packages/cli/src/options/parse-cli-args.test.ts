@@ -71,6 +71,10 @@ describe('parseCliArgs', () => {
       expect(opts(['before.lock', 'after.lock', '--format', 'yarn']).format).toBe('yarn');
     });
 
+    it('supports bun format override', () => {
+      expect(opts(['before.lock', 'after.lock', '--format', 'bun']).format).toBe('bun');
+    });
+
     it('throws when an unsupported format is given', () => {
       expect(() => parseCliArgs(['a.lock', 'b.lock', '--format', 'not-a-format'])).toThrow();
     });

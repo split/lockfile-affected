@@ -26,6 +26,7 @@
     "@lockfile-affected/core": "workspace:*",
     "@lockfile-affected/lockfile-npm": "workspace:*",
     "@lockfile-affected/lockfile-pnpm": "workspace:*",
+    "@lockfile-affected/lockfile-bun": "workspace:*",
     "@lockfile-affected/lockfile-yarn": "workspace:*",
     "@semantic-release/git": "^10.0.0",
     "@semantic-release/github": "^11.0.0",

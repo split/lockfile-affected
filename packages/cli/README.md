@@ -52,13 +52,13 @@ Or pipe the before snapshot via stdin using `-` (works with `npx`):
 git show origin/main:pnpm-lock.yaml | npx lockfile-affected - pnpm-lock.yaml
 ```
 
-Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
+Works with pnpm, npm, yarn (classic v1 and berry v2+), and Bun text lockfiles (`bun.lock`).
 
 ## Options
 
 ```
 --workspace <path>         Root directory to search for package.json files (defaults to cwd)
---format <pnpm|npm|yarn>   Lockfile format override (auto-detected by default)
+--format <pnpm|npm|yarn|bun> Lockfile format override (auto-detected by default)
 --json                     Output as a JSON array instead of newline-separated
 --deps                     Include production dependencies
 --dev                      Include dev dependencies
@@ -74,3 +74,4 @@ Works with pnpm, npm, and yarn lockfiles (classic v1 and berry v2+).
 - [`@lockfile-affected/lockfile-pnpm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-pnpm) — pnpm-lock.yaml parser
 - [`@lockfile-affected/lockfile-npm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-npm) — package-lock.json parser
 - [`@lockfile-affected/lockfile-yarn`](https://www.npmjs.com/package/@lockfile-affected/lockfile-yarn) — yarn.lock parser
+- [`@lockfile-affected/lockfile-bun`](https://www.npmjs.com/package/@lockfile-affected/lockfile-bun) — bun.lock parser

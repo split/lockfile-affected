@@ -7,6 +7,7 @@ export default defineConfig({
       'packages/lockfile-pnpm',
       'packages/lockfile-npm',
       'packages/lockfile-yarn',
+      'packages/lockfile-bun',
       'packages/cli',
     ],
     coverage: {

@@ -5,12 +5,31 @@
 
 Find which workspace packages are affected by lockfile changes.
 
+## Purpose
+
+In monorepos, it is hard to build automation that reacts reliably to transitive
+dependency updates recorded only in lockfiles.
+
+That gap can prevent dependency and security fixes from being rebuilt,
+retested, and deployed in the workspace packages they actually impact.
+
+`lockfile-affected` maps lockfile deltas to affected workspace packages so
+Git and CI pipelines can react deterministically.
+
 ## Installation
+
+Install globally when you want a persistent `lockfile-affected` command:
 
 ```sh
 npm install -g lockfile-affected
 # or
 pnpm add -g lockfile-affected
+```
+
+Install in a repository:
+
+```sh
+pnpm add -D lockfile-affected
 ```
 
 ## Usage

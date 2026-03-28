@@ -1,6 +1,6 @@
 {
   "name": "lockfile-affected",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CLI for identifying affected monorepo packages from lockfile changes",
   "license": "MIT",
   "repository": {

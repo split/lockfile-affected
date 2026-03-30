@@ -154,4 +154,100 @@ describe('resolveAffectedPackages', () => {
 
     expect(affected.size).toBe(0);
   });
+
+  it('marks transitive dependents as affected (pkg-b → pkg-a → lodash)', () => {
+    // Workspace structure:
+    // - pkg-top depends on pkg-middle
+    // - pkg-middle depends on pkg-base
+    // - pkg-base depends on lodash (external)
+    // When lodash changes, ALL packages should be affected
+    const workspace: WorkspaceGraph = new Map([
+      ['pkg-top', { name: 'pkg-top', dependencyGroups: pkgWith({ dependencies: ['pkg-middle'] }) }],
+      [
+        'pkg-middle',
+        { name: 'pkg-middle', dependencyGroups: pkgWith({ dependencies: ['pkg-base'] }) },
+      ],
+      ['pkg-base', { name: 'pkg-base', dependencyGroups: pkgWith({ dependencies: ['lodash'] }) }],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([['lodash', { from: '4.17.21', to: '4.17.22' }]]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    // All three packages should be affected due to transitive chain
+    expect(affected.size).toBe(3);
+    expect(affected.has('pkg-base')).toBe(true); // direct dependency on lodash
+    expect(affected.has('pkg-middle')).toBe(true); // transitive via pkg-base
+    expect(affected.has('pkg-top')).toBe(true); // transitive via pkg-middle
+  });
+
+  it('marks transitive dependents with devDependencies', () => {
+    // Workspace structure:
+    // - pkg-b depends on pkg-a (devDependency)
+    // - pkg-a depends on vitest
+    const workspace: WorkspaceGraph = new Map([
+      ['pkg-b', { name: 'pkg-b', dependencyGroups: pkgWith({ devDependencies: ['pkg-a'] }) }],
+      ['pkg-a', { name: 'pkg-a', dependencyGroups: pkgWith({ devDependencies: ['vitest'] }) }],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([['vitest', { from: '2.0.0', to: '2.1.0' }]]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    // Both should be affected due to transitive chain
+    expect(affected.has('pkg-a')).toBe(true);
+    expect(affected.has('pkg-b')).toBe(true);
+  });
+
+  it('respects filter when traversing transitive dependencies', () => {
+    // Workspace: pkg-b → pkg-a → vitest (devDep)
+    const workspace: WorkspaceGraph = new Map([
+      ['pkg-b', { name: 'pkg-b', dependencyGroups: pkgWith({ dependencies: ['pkg-a'] }) }],
+      ['pkg-a', { name: 'pkg-a', dependencyGroups: pkgWith({ devDependencies: ['vitest'] }) }],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([['vitest', { from: '2.0.0', to: '2.1.0' }]]),
+    };
+
+    // Only check production dependencies - should NOT include vitest changes
+    const affected = resolveAffectedPackages(diff, workspace, { dependencies: true });
+
+    // pkg-a has vitest in devDependencies (not prod), so not directly affected
+    // pkg-b depends on pkg-a (prod), but pkg-a is not affected
+    expect(affected.size).toBe(0);
+  });
+
+  it('handles diamond dependency graph', () => {
+    // Workspace structure (diamond):
+    //       app
+    //      /   \
+    //   lib-a   lib-b
+    //      \   /
+    //      lib-c
+    // When lib-c changes, app, lib-a, and lib-b should all be affected
+    const workspace: WorkspaceGraph = new Map([
+      ['app', { name: 'app', dependencyGroups: pkgWith({ dependencies: ['lib-a', 'lib-b'] }) }],
+      ['lib-a', { name: 'lib-a', dependencyGroups: pkgWith({ dependencies: ['lib-c'] }) }],
+      ['lib-b', { name: 'lib-b', dependencyGroups: pkgWith({ dependencies: ['lib-c'] }) }],
+      ['lib-c', { name: 'lib-c', dependencyGroups: pkgWith({}) }],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([['lib-c', { from: '1.0.0', to: '1.1.0' }]]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    // All packages that depend on lib-c should be affected
+    expect(affected.has('lib-c')).toBe(true);
+    expect(affected.has('lib-a')).toBe(true);
+    expect(affected.has('lib-b')).toBe(true);
+    expect(affected.has('app')).toBe(true);
+    expect(affected.size).toBe(4);
+  });
 });

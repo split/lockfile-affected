@@ -4,12 +4,16 @@ import type {
   LockfileDiff,
   WorkspaceGraph,
 } from '../types/lockfile.js';
+import { findDependents } from './find-dependents.js';
 
 /**
  * Resolves which workspace packages are affected by lockfile changes.
  *
  * A package is considered affected if any dependency — within the groups
  * selected by `filter` — appears in the lockfile diff (added, removed, or changed).
+ *
+ * This includes transitive dependencies: if pkg-a depends on pkg-b, and pkg-b depends
+ * on a changed external package, both pkg-a and pkg-b are marked as affected.
  *
  * Pure function: no side effects.
  */
@@ -24,15 +28,40 @@ export function resolveAffectedPackages(
     return new Set();
   }
 
-  const affected = new Set<string>();
-
-  for (const [packageName, pkg] of workspace) {
-    if (isAffected(pkg.dependencyGroups, changedNames, filter)) {
-      affected.add(packageName);
+  // Step 1: Find workspace packages that appear in the lockfile diff
+  // (these are workspace packages whose version changed in the lockfile)
+  const directlyAffected = new Set<string>();
+  for (const [packageName] of workspace) {
+    if (changedNames.has(packageName)) {
+      directlyAffected.add(packageName);
     }
   }
 
-  return affected;
+  // Step 2: Find packages that directly depend on changed external packages
+  for (const [packageName, pkg] of workspace) {
+    if (isAffected(pkg.dependencyGroups, changedNames, filter)) {
+      directlyAffected.add(packageName);
+    }
+  }
+
+  // Step 3: Find all transitive dependents of the directly affected packages
+  // This traverses the workspace graph to find the full chain of affected packages
+  const allAffected = new Set<string>(directlyAffected);
+  const toProcess = Array.from(directlyAffected);
+
+  while (toProcess.length > 0) {
+    const current = toProcess.pop()!;
+    const transitiveDependents = findDependents(current, workspace, filter);
+
+    for (const dependent of transitiveDependents) {
+      if (!allAffected.has(dependent)) {
+        allAffected.add(dependent);
+        toProcess.push(dependent);
+      }
+    }
+  }
+
+  return allAffected;
 }
 
 function collectChangedDependencyNames(diff: LockfileDiff): ReadonlySet<string> {

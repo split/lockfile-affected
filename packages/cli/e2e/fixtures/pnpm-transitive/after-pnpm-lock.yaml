@@ -1,0 +1,28 @@
+lockfileVersion: '9.0'
+
+metadata:
+  packageManager: pnpm@9.15.9
+
+importers:
+  .:
+    dependencies:
+      lodash:
+        specifier: ^4.17.0
+        version: 4.17.22
+      react:
+        specifier: ^18.0.0
+        version: 18.2.0
+
+packages:
+  lodash@4.17.22:
+    resolution:
+      {
+        integrity: sha512-nFEy64W3jilNPEu6HVMaaBW5jWCisB0xfpRx2u8tEDA8lWQV8mtawcoNQQqvFSPa+nakrUDA7Dsbl0RrXd7vDw==,
+      }
+
+  react@18.2.0:
+    resolution: { integrity: sha512-dummy }
+
+snapshots:
+  lodash@4.17.22: {}
+  react@18.2.0: {}

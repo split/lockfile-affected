@@ -11,6 +11,8 @@ export type DetectedLockfile = {
  * Finds the first known lockfile in `dir` by checking each parser's `lockfileNames`.
  * Returns the absolute path and the format name from the matching parser.
  * Throws if no lockfile is found.
+ *
+ * Supports: pnpm, npm, yarn, and bun lockfile formats.
  */
 export async function detectLockfile(
   dir: string,

@@ -2,6 +2,15 @@
   "name": "@lockfile-affected/lockfile-yarn",
   "version": "0.2.0",
   "description": "yarn.lock adapter for lockfile-affected",
+  "keywords": [
+    "yarn",
+    "lockfile",
+    "adapter",
+    "parser",
+    "affected",
+    "monorepo",
+    "dependencies"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

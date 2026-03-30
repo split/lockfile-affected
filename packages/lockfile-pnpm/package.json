@@ -2,6 +2,15 @@
   "name": "@lockfile-affected/lockfile-pnpm",
   "version": "0.2.0",
   "description": "pnpm-lock.yaml adapter for lockfile-affected",
+  "keywords": [
+    "pnpm",
+    "lockfile",
+    "yaml",
+    "adapter",
+    "parser",
+    "affected",
+    "monorepo"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

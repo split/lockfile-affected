@@ -2,6 +2,14 @@
   "name": "@lockfile-affected/lockfile-bun",
   "version": "1.0.0",
   "description": "bun.lock adapter for lockfile-affected",
+  "keywords": [
+    "bun",
+    "lockfile",
+    "adapter",
+    "parser",
+    "affected",
+    "monorepo"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

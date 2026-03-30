@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Core diff engine and affected package resolver",
   "license": "MIT",
   "repository": {

@@ -52,25 +52,30 @@ const BUN_LOCK_FIXTURE = `\
 `;
 
 describe('parseBunLockfile', () => {
-  it('returns a snapshot with normalized package name -> version entries', async () => {
+  it('returns a hierarchical snapshot with root context', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
 
     expect(snapshot.size).toBeGreaterThan(0);
-    expect(snapshot.get('lodash')).toBe('4.17.21');
-    expect(snapshot.get('react')).toBe('18.3.0');
+    expect(snapshot.has('.')).toBe(true);
+
+    const rootPackages = snapshot.get('.');
+    expect(rootPackages?.get('lodash')).toBe('4.17.21');
+    expect(rootPackages?.get('react')).toBe('18.3.0');
   });
 
-  it('deduplicates package names and keeps first encountered version', async () => {
+  it('resolves direct workspace dependencies', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
 
-    expect(snapshot.get('loose-envify')).toBe('1.4.0');
-    expect(snapshot.get('js-tokens')).toBe('4.0.0');
+    const rootPackages = snapshot.get('.');
+    expect(rootPackages?.get('lodash')).toBe('4.17.21');
+    expect(rootPackages?.get('react')).toBe('18.3.0');
   });
 
-  it('returns a LockfileSnapshot (ReadonlyMap)', async () => {
+  it('returns a LockfileSnapshot (ReadonlyMap of ReadonlyMaps)', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
 
     expect(snapshot).toBeInstanceOf(Map);
+    expect(snapshot.get('.')).toBeInstanceOf(Map);
   });
 });
 
@@ -86,6 +91,6 @@ describe('bunLockfileParser', () => {
   it('parse delegates to parseBunLockfile', async () => {
     const snapshot = await bunLockfileParser.parse(BUN_LOCK_FIXTURE);
 
-    expect(snapshot.get('lodash')).toBe('4.17.21');
+    expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
   });
 });

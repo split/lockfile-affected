@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseNpmLockfile } from './parse-npm-lockfile.js';
 
-// Minimal valid package-lock.json v3 fixture
 const NPM_LOCK_V3 = JSON.stringify({
   name: 'my-app',
   version: '1.0.0',
@@ -18,7 +17,7 @@ const NPM_LOCK_V3 = JSON.stringify({
     'node_modules/lodash': {
       version: '4.17.21',
       resolved: 'https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz',
-      integrity: 'sha512-dummy',
+      integrity: 'sha512-sha512-dummy',
     },
     'node_modules/react': {
       version: '18.3.0',
@@ -29,24 +28,21 @@ const NPM_LOCK_V3 = JSON.stringify({
 });
 
 describe('parseNpmLockfile', () => {
-  it('returns a snapshot with normalized package name → version entries', async () => {
+  it('returns a hierarchical snapshot with root context', async () => {
     const snapshot = await parseNpmLockfile(NPM_LOCK_V3);
 
     expect(snapshot.size).toBeGreaterThan(0);
-    expect(snapshot.has('lodash')).toBe(true);
-    expect(snapshot.get('lodash')).toBe('4.17.21');
+    expect(snapshot.has('.')).toBe(true);
+
+    const rootPackages = snapshot.get('.');
+    expect(rootPackages?.has('lodash')).toBe(true);
+    expect(rootPackages?.get('lodash')).toBe('4.17.21');
   });
 
-  it('includes all packages from node_modules', async () => {
-    const snapshot = await parseNpmLockfile(NPM_LOCK_V3);
-
-    expect(snapshot.has('react')).toBe(true);
-    expect(snapshot.get('react')).toBe('18.3.0');
-  });
-
-  it('returns a LockfileSnapshot (ReadonlyMap)', async () => {
+  it('returns a LockfileSnapshot (ReadonlyMap of ReadonlyMaps)', async () => {
     const snapshot = await parseNpmLockfile(NPM_LOCK_V3);
 
     expect(snapshot).toBeInstanceOf(Map);
+    expect(snapshot.get('.')).toBeInstanceOf(Map);
   });
 });

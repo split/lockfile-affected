@@ -16,12 +16,14 @@ function makeParser(): LockfileParser {
     format: 'fake',
     lockfileNames: ['fake.lock'],
     parse: async (content: string): Promise<LockfileSnapshot> => {
-      const map = new Map<string, string>();
+      const snapshot = new Map<string, ReadonlyMap<string, string>>();
+      const rootPackages = new Map<string, string>();
       for (const line of content.split('\n').filter(Boolean)) {
         const [name, version] = line.split('@');
-        if (name && version) map.set(name, version);
+        if (name && version) rootPackages.set(name, version);
       }
-      return map;
+      snapshot.set('.', rootPackages);
+      return snapshot;
     },
   };
 }

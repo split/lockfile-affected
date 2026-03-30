@@ -1,22 +1,35 @@
 import type { LockfileParser, LockfileSnapshot } from '@lockfile-affected/core';
-import { parse, type ParsedDependency } from 'lockparse';
+import { parse as jsoncParse } from 'jsonc-parser';
 
-/**
- * Parses a bun.lock file into a normalized LockfileSnapshot.
- * Uses lockparse as the underlying parser for a unified IR.
- */
-export async function parseBunLockfile(content: string): Promise<LockfileSnapshot> {
-  const parsed = await parse(content, 'bun');
-  return toSnapshot(parsed.packages);
+interface BunLockfile {
+  workspaces?: Record<string, { dependencies?: Record<string, string> }>;
+  packages: Record<string, string[]>;
 }
 
-function toSnapshot(packages: readonly ParsedDependency[]): LockfileSnapshot {
-  const snapshot = new Map<string, string>();
+export async function parseBunLockfile(content: string): Promise<LockfileSnapshot> {
+  const parsed = jsoncParse(content) as BunLockfile;
+  return toSnapshot(parsed);
+}
 
-  for (const pkg of packages) {
-    if (pkg.name && pkg.version) {
-      if (!snapshot.has(pkg.name)) {
-        snapshot.set(pkg.name, pkg.version);
+function toSnapshot(lockfile: BunLockfile): LockfileSnapshot {
+  const snapshot = new Map<string, ReadonlyMap<string, string>>();
+
+  if (lockfile.workspaces) {
+    for (const [workspacePath, workspace] of Object.entries(lockfile.workspaces)) {
+      const packages = new Map<string, string>();
+      const context = workspacePath === '' ? '.' : workspacePath;
+
+      if (workspace.dependencies) {
+        for (const [pkgName, specifier] of Object.entries(workspace.dependencies)) {
+          const resolvedVersion = resolveVersion(pkgName, specifier, lockfile.packages);
+          if (resolvedVersion) {
+            packages.set(pkgName, resolvedVersion);
+          }
+        }
+      }
+
+      if (packages.size > 0) {
+        snapshot.set(context, packages);
       }
     }
   }
@@ -24,9 +37,31 @@ function toSnapshot(packages: readonly ParsedDependency[]): LockfileSnapshot {
   return snapshot;
 }
 
-/**
- * The LockfileParser adapter for Bun, conforming to the core contract.
- */
+function resolveVersion(
+  pkgName: string,
+  _specifier: string,
+  packages: Record<string, string[]>,
+): string | undefined {
+  const exactKey = pkgName;
+  if (packages[exactKey]?.[0]) {
+    return extractVersion(packages[exactKey][0]);
+  }
+
+  for (const [key, value] of Object.entries(packages)) {
+    if (key === pkgName || key.startsWith(pkgName + '@')) {
+      return extractVersion(value[0]);
+    }
+  }
+
+  return undefined;
+}
+
+function extractVersion(nameAtVersion: string | undefined): string | undefined {
+  if (!nameAtVersion) return undefined;
+  const atIndex = nameAtVersion.lastIndexOf('@');
+  return atIndex === -1 ? nameAtVersion : nameAtVersion.slice(atIndex + 1);
+}
+
 export const bunLockfileParser: LockfileParser = {
   format: 'bun',
   lockfileNames: ['bun.lock'],

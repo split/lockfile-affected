@@ -1,36 +1,57 @@
 import type { LockfileParser, LockfileSnapshot } from '@lockfile-affected/core';
-import { parse, type ParsedDependency } from 'lockparse';
+import YAML from 'yaml';
 
-/**
- * Parses a pnpm-lock.yaml file into a normalized LockfileSnapshot.
- * Uses lockparse as the underlying parser for a unified IR.
- *
- * Package names with peer dependency suffixes (e.g. react@18.0.0(typescript@5.0.0))
- * are normalized to just name → version.
- */
-export async function parsePnpmLockfile(content: string): Promise<LockfileSnapshot> {
-  const parsed = await parse(content, 'pnpm');
-  return toSnapshot(parsed.packages);
+interface PnpmImporter {
+  dependencies?: Record<string, { specifier: string; version: string }>;
+  devDependencies?: Record<string, { specifier: string; version: string }>;
+  peerDependencies?: Record<string, { specifier: string; version: string }>;
+  optionalDependencies?: Record<string, { specifier: string; version: string }>;
 }
 
-function toSnapshot(packages: readonly ParsedDependency[]): LockfileSnapshot {
-  const snapshot = new Map<string, string>();
+interface PnpmLockfile {
+  importers: Record<string, PnpmImporter>;
+}
 
-  for (const pkg of packages) {
-    if (pkg.name && pkg.version) {
-      // First-encountered version wins. lockparse normalizes peer suffixes already.
-      if (!snapshot.has(pkg.name)) {
-        snapshot.set(pkg.name, pkg.version);
+export async function parsePnpmLockfile(content: string): Promise<LockfileSnapshot> {
+  const parsed = YAML.parse(content) as PnpmLockfile;
+  return toSnapshot(parsed);
+}
+
+function stripPeerSuffix(version: string): string {
+  const parenIndex = version.indexOf('(');
+  return parenIndex === -1 ? version : version.slice(0, parenIndex);
+}
+
+function toSnapshot(lockfile: PnpmLockfile): LockfileSnapshot {
+  const snapshot = new Map<string, ReadonlyMap<string, string>>();
+
+  for (const [importerPath, importer] of Object.entries(lockfile.importers)) {
+    const packages = new Map<string, string>();
+
+    const depTypes = [
+      importer.dependencies,
+      importer.devDependencies,
+      importer.peerDependencies,
+      importer.optionalDependencies,
+    ];
+
+    for (const deps of depTypes) {
+      if (deps) {
+        for (const [pkgName, pkgInfo] of Object.entries(deps)) {
+          const version = stripPeerSuffix(pkgInfo.version);
+          packages.set(pkgName, version);
+        }
       }
+    }
+
+    if (packages.size > 0) {
+      snapshot.set(importerPath, packages);
     }
   }
 
   return snapshot;
 }
 
-/**
- * The LockfileParser adapter for pnpm, conforming to the core contract.
- */
 export const pnpmLockfileParser: LockfileParser = {
   format: 'pnpm',
   lockfileNames: ['pnpm-lock.yaml'],

@@ -1,19 +1,40 @@
 /**
- * A normalized snapshot of a lockfile: maps each package name to its resolved version.
- * This is the common representation all lockfile adapters produce.
+ * A normalized snapshot of a lockfile: maps each context (importer/workspace path)
+ * to a map of package name → resolved version.
+ *
+ * The context is the workspace/importer path:
+ * - pnpm: "." for root, "packages/pkg-a" for workspace packages
+ * - npm/yarn/bun: "." for root, workspace paths
+ *
+ * This hierarchical structure preserves per-context version resolution, ensuring
+ * changes in specific workspace packages are detected even if the same package
+ * exists elsewhere with a different version.
  */
-export type LockfileSnapshot = ReadonlyMap<string, string>;
+export type LockfileSnapshot = ReadonlyMap<string, ReadonlyMap<string, string>>;
+
+/**
+ * Changes within a single context (importer/workspace).
+ */
+export type ContextDiff = {
+  /** Packages added in this context. key = name, value = new version */
+  readonly added: ReadonlyMap<string, string>;
+  /** Packages removed from this context. key = name, value = old version */
+  readonly removed: ReadonlyMap<string, string>;
+  /** Packages whose resolved version changed in this context. key = name, value = { from, to } */
+  readonly changed: ReadonlyMap<string, { readonly from: string; readonly to: string }>;
+};
 
 /**
  * The result of comparing two lockfile snapshots.
+ * Compares per-context to detect changes in specific workspace packages.
  */
 export type LockfileDiff = {
-  /** Packages added in the new snapshot. key = name, value = new version */
-  readonly added: ReadonlyMap<string, string>;
-  /** Packages removed from the new snapshot. key = name, value = old version */
-  readonly removed: ReadonlyMap<string, string>;
-  /** Packages whose resolved version changed. key = name, value = { from, to } */
-  readonly changed: ReadonlyMap<string, { readonly from: string; readonly to: string }>;
+  /** Contexts added in the new snapshot (new workspace packages). key = context path */
+  readonly addedContexts: ReadonlyMap<string, ReadonlyMap<string, string>>;
+  /** Contexts removed from the new snapshot. key = context path, value = packages that were there */
+  readonly removedContexts: ReadonlyMap<string, ReadonlyMap<string, string>>;
+  /** Changes per context. key = context path, value = diff for that context */
+  readonly changed: ReadonlyMap<string, ContextDiff>;
 };
 
 /**

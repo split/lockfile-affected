@@ -1,33 +1,100 @@
 import type { LockfileParser, LockfileSnapshot } from '@lockfile-affected/core';
-import { parse, type ParsedDependency } from 'lockparse';
 
-/**
- * Parses a package-lock.json file into a normalized LockfileSnapshot.
- * Supports lockfileVersion 2 and 3.
- * Uses lockparse as the underlying parser for a unified IR.
- */
-export async function parseNpmLockfile(content: string): Promise<LockfileSnapshot> {
-  const parsed = await parse(content, 'npm');
-  return toSnapshot(parsed.packages);
+interface NpmPackageLock {
+  packages: Record<string, NpmPackageEntry>;
 }
 
-function toSnapshot(packages: readonly ParsedDependency[]): LockfileSnapshot {
-  const snapshot = new Map<string, string>();
+interface NpmPackageEntry {
+  version?: string;
+  resolved?: string;
+  dependencies?: Record<string, string>;
+}
 
-  for (const pkg of packages) {
-    if (pkg.name && pkg.version) {
-      if (!snapshot.has(pkg.name)) {
-        snapshot.set(pkg.name, pkg.version);
+export async function parseNpmLockfile(content: string): Promise<LockfileSnapshot> {
+  const lockfile = JSON.parse(content) as NpmPackageLock;
+  return toSnapshot(lockfile);
+}
+
+function toSnapshot(lockfile: NpmPackageLock): LockfileSnapshot {
+  const snapshot = new Map<string, ReadonlyMap<string, string>>();
+
+  const contexts = new Set<string>();
+  contexts.add('.');
+
+  for (const key of Object.keys(lockfile.packages)) {
+    if (key.startsWith('packages/')) {
+      const workspacePath = key.split('/node_modules/')[0];
+      if (workspacePath && !workspacePath.includes('node_modules')) {
+        contexts.add(workspacePath);
       }
+    }
+  }
+
+  for (const context of contexts) {
+    const packages = extractContextPackages(context, lockfile.packages);
+    if (packages.size > 0) {
+      snapshot.set(context, packages);
     }
   }
 
   return snapshot;
 }
 
-/**
- * The LockfileParser adapter for npm, conforming to the core contract.
- */
+function extractContextPackages(
+  context: string,
+  packages: Record<string, NpmPackageEntry>,
+): Map<string, string> {
+  const result = new Map<string, string>();
+
+  const depKeys = getDependencyKeys(context, packages);
+
+  for (const depKey of depKeys) {
+    const pkg = packages[depKey];
+    if (pkg?.version) {
+      const depName = depKey
+        .replace(/^node_modules\//, '')
+        .split('/node_modules/')
+        .pop();
+      if (depName) {
+        const nameParts = depName.split('/');
+        const name = depName.startsWith('@') ? nameParts.slice(0, 2).join('/') : nameParts[0];
+        if (name && !result.has(name)) {
+          result.set(name, pkg.version);
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+function getDependencyKeys(context: string, packages: Record<string, NpmPackageEntry>): string[] {
+  const keys: string[] = [];
+
+  if (context === '.') {
+    const rootPkg = packages[''];
+    if (rootPkg?.dependencies) {
+      for (const dep of Object.keys(rootPkg.dependencies)) {
+        keys.push(`node_modules/${dep}`);
+      }
+    }
+  } else {
+    const workspacePkg = packages[context];
+    if (workspacePkg?.dependencies) {
+      for (const dep of Object.keys(workspacePkg.dependencies)) {
+        const nestedPath = `${context}/node_modules/${dep}`;
+        if (packages[nestedPath]) {
+          keys.push(nestedPath);
+        } else {
+          keys.push(`node_modules/${dep}`);
+        }
+      }
+    }
+  }
+
+  return keys;
+}
+
 export const npmLockfileParser: LockfileParser = {
   format: 'npm',
   lockfileNames: ['package-lock.json'],

@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/core",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "Core diff engine and affected package resolver",
   "keywords": [
     "lockfile",

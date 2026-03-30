@@ -12,6 +12,7 @@
     "resolver"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/split/lockfile-affected",
   "repository": {
     "type": "git",
     "url": "https://github.com/split/lockfile-affected"
@@ -46,7 +47,7 @@
   "devDependencies": {
     "vitest": "*",
     "@vitest/coverage-v8": "*",
-    "@types/node": "*",
-    "typescript": "*"
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
   }
 }

@@ -25,3 +25,7 @@ npm install @lockfile-affected/lockfile-yarn
 For Git-based and CI usage patterns, see
 [`lockfile-affected`](https://www.npmjs.com/package/lockfile-affected)
 or the [CLI README](https://github.com/split/lockfile-affected/tree/main/packages/cli#readme).
+
+## Publishing
+
+This package is automatically published to npm via GitHub Actions with provenance attestation.

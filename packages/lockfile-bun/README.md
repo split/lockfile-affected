@@ -34,3 +34,7 @@ bunLockfileParser.lockfileNames; // ["bun.lock"]
 - [`@lockfile-affected/lockfile-pnpm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-pnpm) - pnpm adapter
 - [`@lockfile-affected/lockfile-npm`](https://www.npmjs.com/package/@lockfile-affected/lockfile-npm) - npm adapter
 - [`@lockfile-affected/lockfile-yarn`](https://www.npmjs.com/package/@lockfile-affected/lockfile-yarn) - yarn adapter
+
+## Publishing
+
+This package is automatically published to npm via GitHub Actions with provenance attestation.

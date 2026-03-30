@@ -11,7 +11,13 @@ const config = {
   tagFormat: `${currentPackageName}-v\${version}`,
   plugins: [
     createScopedReleaseCommitsPlugin(),
-    '@semantic-release/npm',
+    [
+      '@semantic-release/exec',
+      {
+        prepareCmd: 'npm version ${nextRelease.version} --no-git-tag-version',
+        publishCmd: 'pnpm publish --access public',
+      },
+    ],
     '@semantic-release/git',
     '@semantic-release/github',
   ],

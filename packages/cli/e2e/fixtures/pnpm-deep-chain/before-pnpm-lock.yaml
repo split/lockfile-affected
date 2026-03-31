@@ -1,0 +1,31 @@
+lockfileVersion: '9.0'
+
+metadata:
+  packageManager: pnpm@9.15.9
+
+importers:
+  .: {}
+  packages/pkg-top:
+    dependencies:
+      pkg-middle:
+        specifier: workspace:*
+        version: 1.0.0
+  packages/pkg-middle:
+    dependencies:
+      pkg-base:
+        specifier: workspace:*
+        version: 1.0.0
+  packages/pkg-base:
+    dependencies:
+      pkg-leaf:
+        specifier: workspace:*
+        version: 1.0.0
+  packages/pkg-leaf:
+    dependencies:
+      express:
+        specifier: ^4.18.0
+        version: 4.18.0
+
+packages:
+  express@4.18.0:
+    resolution: { integrity: sha512-sha256-abc123 }

@@ -1,0 +1,7 @@
+{
+  "name": "pkg-middle",
+  "version": "1.0.0",
+  "dependencies": {
+    "pkg-base": "workspace:*"
+  }
+}

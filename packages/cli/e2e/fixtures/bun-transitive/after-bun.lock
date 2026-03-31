@@ -7,9 +7,25 @@
       "dependencies": {
         "lodash": "^4.17.0"
       }
+    },
+    "packages/pkg-base": {
+      "name": "pkg-base",
+      "version": "1.0.0",
+      "dependencies": {
+        "lodash": "^4.17.23"
+      }
+    },
+    "packages/pkg-middle": {
+      "name": "pkg-middle",
+      "version": "1.0.0",
+      "dependencies": {
+        "pkg-base": "1.0.0"
+      }
     }
   },
   "packages": {
-    "lodash": ["lodash@4.17.23", "", {}, "sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w=="]
+    "lodash": ["lodash@4.17.23", "", {}, "sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w=="],
+    "lodash@4.17.21": ["lodash@4.17.21", "", {}, "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w=="],
+    "lodash@4.17.23": ["lodash@4.17.23", "", {}, "sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w=="]
   }
 }

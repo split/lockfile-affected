@@ -317,4 +317,122 @@ describe('resolveAffectedPackages', () => {
     expect(affected.has('app')).toBe(true);
     expect(affected.size).toBe(4);
   });
+
+  it('handles mutual circular dependencies (a → b → a) with external dep', () => {
+    const workspace: WorkspaceGraph = new Map([
+      [
+        'pkg-a',
+        { name: 'pkg-a', dependencyGroups: pkgWith({ dependencies: ['pkg-b', 'lodash'] }) },
+      ],
+      ['pkg-b', { name: 'pkg-b', dependencyGroups: pkgWith({ dependencies: ['pkg-a'] }) }],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([
+        [
+          '.',
+          {
+            added: new Map(),
+            removed: new Map(),
+            changed: new Map([['lodash', { from: '1.0.0', to: '2.0.0' }]]),
+          },
+        ],
+      ]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    expect(affected.size).toBe(2);
+    expect(affected.has('pkg-a')).toBe(true);
+    expect(affected.has('pkg-b')).toBe(true);
+  });
+
+  it('handles long circular dependencies (a → b → c → a) with external dep', () => {
+    const workspace: WorkspaceGraph = new Map([
+      ['pkg-a', { name: 'pkg-a', dependencyGroups: pkgWith({ dependencies: ['pkg-b'] }) }],
+      ['pkg-b', { name: 'pkg-b', dependencyGroups: pkgWith({ dependencies: ['pkg-c'] }) }],
+      [
+        'pkg-c',
+        { name: 'pkg-c', dependencyGroups: pkgWith({ dependencies: ['pkg-a', 'lodash'] }) },
+      ],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([
+        [
+          '.',
+          {
+            added: new Map(),
+            removed: new Map(),
+            changed: new Map([['lodash', { from: '1.0.0', to: '2.0.0' }]]),
+          },
+        ],
+      ]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    expect(affected.size).toBe(3);
+    expect(affected.has('pkg-a')).toBe(true);
+    expect(affected.has('pkg-b')).toBe(true);
+    expect(affected.has('pkg-c')).toBe(true);
+  });
+
+  it('handles self-referencing packages with external dep', () => {
+    const workspace: WorkspaceGraph = new Map([
+      [
+        'pkg-a',
+        { name: 'pkg-a', dependencyGroups: pkgWith({ dependencies: ['pkg-a', 'lodash'] }) },
+      ],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([
+        [
+          '.',
+          {
+            added: new Map(),
+            removed: new Map(),
+            changed: new Map([['lodash', { from: '1.0.0', to: '2.0.0' }]]),
+          },
+        ],
+      ]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    expect(affected.size).toBe(1);
+    expect(affected.has('pkg-a')).toBe(true);
+  });
+
+  it('handles cycle with external dependency change at the cycle boundary', () => {
+    const workspace: WorkspaceGraph = new Map([
+      [
+        'pkg-a',
+        { name: 'pkg-a', dependencyGroups: pkgWith({ dependencies: ['pkg-b', 'express'] }) },
+      ],
+      ['pkg-b', { name: 'pkg-b', dependencyGroups: pkgWith({ dependencies: ['pkg-c'] }) }],
+      ['pkg-c', { name: 'pkg-c', dependencyGroups: pkgWith({ dependencies: ['pkg-a'] }) }],
+    ]);
+    const diff: LockfileDiff = {
+      ...emptyDiff,
+      changed: new Map([
+        [
+          '.',
+          {
+            added: new Map(),
+            removed: new Map(),
+            changed: new Map([['express', { from: '4.18.0', to: '4.19.0' }]]),
+          },
+        ],
+      ]),
+    };
+
+    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+
+    expect(affected.size).toBe(3);
+    expect(affected.has('pkg-a')).toBe(true);
+    expect(affected.has('pkg-b')).toBe(true);
+    expect(affected.has('pkg-c')).toBe(true);
+  });
 });

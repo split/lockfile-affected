@@ -63,12 +63,14 @@ describe('parseBunLockfile', () => {
     expect(rootPackages?.get('react')).toBe('18.3.0');
   });
 
-  it('resolves direct workspace dependencies', async () => {
+  it('only includes direct dependencies (not transitive)', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
-
     const rootPackages = snapshot.get('.');
+
     expect(rootPackages?.get('lodash')).toBe('4.17.21');
     expect(rootPackages?.get('react')).toBe('18.3.0');
+    expect(rootPackages?.get('loose-envify')).toBeUndefined();
+    expect(rootPackages?.get('js-tokens')).toBeUndefined();
   });
 
   it('returns a LockfileSnapshot (ReadonlyMap of ReadonlyMaps)', async () => {
@@ -76,6 +78,43 @@ describe('parseBunLockfile', () => {
 
     expect(snapshot).toBeInstanceOf(Map);
     expect(snapshot.get('.')).toBeInstanceOf(Map);
+  });
+
+  it('returns empty snapshot for empty workspaces', async () => {
+    const emptyLock = JSON.stringify({
+      lockfileVersion: 1,
+      packages: {},
+    });
+
+    const snapshot = await parseBunLockfile(emptyLock);
+    expect(snapshot.size).toBe(0);
+  });
+
+  it('extracts workspace packages into separate contexts', async () => {
+    const multiWorkspaceLock = JSON.stringify({
+      lockfileVersion: 1,
+      workspaces: {
+        '': {
+          name: 'root',
+          dependencies: { lodash: '^4.17.0' },
+        },
+        'packages/pkg-a': {
+          dependencies: { react: '^18.0.0' },
+        },
+      },
+      packages: {
+        lodash: ['lodash@4.17.21', '', {}],
+        react: ['react@18.2.0', '', {}],
+      },
+    });
+
+    const snapshot = await parseBunLockfile(multiWorkspaceLock);
+
+    expect(snapshot.has('.')).toBe(true);
+    expect(snapshot.has('packages/pkg-a')).toBe(true);
+
+    expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
+    expect(snapshot.get('packages/pkg-a')?.get('react')).toBe('18.2.0');
   });
 });
 

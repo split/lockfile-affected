@@ -49,7 +49,7 @@ importers:
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: ^3.0.0
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       eslint:
         specifier: ^9.22.0
         version: 9.39.4
@@ -67,10 +67,10 @@ importers:
         version: 8.57.2(eslint@9.39.4)(typescript@5.9.3)
       vite-tsconfig-paths:
         specifier: 6.1.1
-        version: 6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.15))
+        version: 6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.15)(yaml@2.8.3))
       vitest:
         specifier: ^3.0.0
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
   packages/cli:
     dependencies:
@@ -95,13 +95,13 @@ importers:
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: '*'
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
       vitest:
         specifier: '*'
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
   packages/core:
     devDependencies:
@@ -110,101 +110,98 @@ importers:
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: '*'
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
       vitest:
         specifier: '*'
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
   packages/lockfile-bun:
     dependencies:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:../core
-      lockparse:
-        specifier: ^0.5.0
-        version: 0.5.0
+      jsonc-parser:
+        specifier: ^3.0.0
+        version: 3.3.1
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: '*'
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
       vitest:
         specifier: '*'
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
   packages/lockfile-npm:
     dependencies:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:../core
-      lockparse:
-        specifier: ^0.5.0
-        version: 0.5.0
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: '*'
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
       vitest:
         specifier: '*'
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
   packages/lockfile-pnpm:
     dependencies:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:../core
-      lockparse:
-        specifier: ^0.5.0
-        version: 0.5.0
+      yaml:
+        specifier: ^2.0.0
+        version: 2.8.3
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: '*'
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
       vitest:
         specifier: '*'
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
   packages/lockfile-yarn:
     dependencies:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:../core
-      lockparse:
-        specifier: ^0.5.0
-        version: 0.5.0
+      yaml:
+        specifier: ^2.0.0
+        version: 2.8.3
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.15
       '@vitest/coverage-v8':
         specifier: '*'
-        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15))
+        version: 3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
       vitest:
         specifier: '*'
-        version: 3.2.4(@types/node@22.19.15)
+        version: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
 
 packages:
 
@@ -1566,6 +1563,9 @@ packages:
   json-with-bigint@3.5.8:
     resolution: {integrity: sha512-eq/4KP6K34kwa7TcFdtvnftvHCD9KvHOGGICWwMFc4dOOKF5t4iYqnfLK8otCRCRv06FXOzGGyqE8h8ElMvvdw==}
 
+  jsonc-parser@3.3.1:
+    resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
+
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
 
@@ -1590,9 +1590,6 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
-
-  lockparse@0.5.0:
-    resolution: {integrity: sha512-seaI91ZVc4mnEGL+/cEEd5MybTnb86NH3W5lM0Ft7CMCZsLP5z1orWnu8g7YacpiMc5GxU7wIrYLhb6W2DvNWg==}
 
   lodash-es@4.17.23:
     resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
@@ -2532,6 +2529,11 @@ packages:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
 
+  yaml@2.8.3:
+    resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
@@ -3153,7 +3155,7 @@ snapshots:
       '@typescript-eslint/types': 8.57.2
       eslint-visitor-keys: 5.0.1
 
-  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/node@22.19.15))':
+  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -3168,7 +3170,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 7.0.2
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@22.19.15)
+      vitest: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -3180,13 +3182,13 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@22.19.15))':
+  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@22.19.15)(yaml@2.8.3))':
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.1(@types/node@22.19.15)
+      vite: 7.3.1(@types/node@22.19.15)(yaml@2.8.3)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -3909,6 +3911,8 @@ snapshots:
 
   json-with-bigint@3.5.8: {}
 
+  jsonc-parser@3.3.1: {}
+
   jsonfile@6.2.0:
     dependencies:
       universalify: 2.0.1
@@ -3941,8 +3945,6 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
-
-  lockparse@0.5.0: {}
 
   lodash-es@4.17.23: {}
 
@@ -4596,13 +4598,13 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  vite-node@3.2.4(@types/node@22.19.15):
+  vite-node@3.2.4(@types/node@22.19.15)(yaml@2.8.3):
     dependencies:
       cac: 6.7.14
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.3.1(@types/node@22.19.15)
+      vite: 7.3.1(@types/node@22.19.15)(yaml@2.8.3)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -4617,17 +4619,17 @@ snapshots:
       - tsx
       - yaml
 
-  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.15)):
+  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.15)(yaml@2.8.3)):
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.9.3)
-      vite: 7.3.1(@types/node@22.19.15)
+      vite: 7.3.1(@types/node@22.19.15)(yaml@2.8.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@7.3.1(@types/node@22.19.15):
+  vite@7.3.1(@types/node@22.19.15)(yaml@2.8.3):
     dependencies:
       esbuild: 0.27.4
       fdir: 6.5.0(picomatch@4.0.4)
@@ -4638,12 +4640,13 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.19.15
       fsevents: 2.3.3
+      yaml: 2.8.3
 
-  vitest@3.2.4(@types/node@22.19.15):
+  vitest@3.2.4(@types/node@22.19.15)(yaml@2.8.3):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@22.19.15))
+      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@22.19.15)(yaml@2.8.3))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -4661,8 +4664,8 @@ snapshots:
       tinyglobby: 0.2.15
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 7.3.1(@types/node@22.19.15)
-      vite-node: 3.2.4(@types/node@22.19.15)
+      vite: 7.3.1(@types/node@22.19.15)(yaml@2.8.3)
+      vite-node: 3.2.4(@types/node@22.19.15)(yaml@2.8.3)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.19.15
@@ -4710,6 +4713,8 @@ snapshots:
   xtend@4.0.2: {}
 
   y18n@5.0.8: {}
+
+  yaml@2.8.3: {}
 
   yargs-parser@20.2.9: {}
 

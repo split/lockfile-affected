@@ -74,9 +74,9 @@ const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
 ### `resolveAffectedPackages(diff, workspaceGraph, filter?)`
 
 ```ts
-import { resolveAffectedPackages, ALL_DEPENDENCY_TYPES } from '@lockfile-affected/core';
+import { resolveAffectedPackages, allDependencyTypes } from '@lockfile-affected/core';
 
-const affected = resolveAffectedPackages(diff, workspaceGraph, ALL_DEPENDENCY_TYPES);
+const affected = resolveAffectedPackages(diff, workspaceGraph, allDependencyTypes);
 // ReadonlySet<string> of affected package names
 ```
 

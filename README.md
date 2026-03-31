@@ -3,6 +3,8 @@
 [![CI](https://github.com/split/lockfile-affected/actions/workflows/ci.yml/badge.svg)](https://github.com/split/lockfile-affected/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/lockfile-affected)](https://www.npmjs.com/package/lockfile-affected)
 
+> **Warning:** This tool is still in early development. The API may change, and some features are incomplete or not yet fully tested. Use in production at your own risk.
+
 Find which workspace packages are affected by lockfile changes.
 
 ## Installation
@@ -29,7 +31,7 @@ Pass the before and after lockfile snapshots as arguments:
 lockfile-affected pnpm-lock.yaml.old pnpm-lock.yaml
 ```
 
-Works with pnpm, npm, yarn (classic v1 and berry v2+), and Bun text lockfiles (`bun.lock`).
+Works with pnpm, npm, Yarn Berry (v2+), and Bun text lockfiles (`bun.lock`).
 
 For full Git and CI usage patterns, see the CLI guide:
 [`packages/cli/README.md`](packages/cli/README.md).
@@ -40,5 +42,9 @@ For full Git and CI usage patterns, see the CLI guide:
 - [`@lockfile-affected/core`](packages/core) — pure diff and resolution engine
 - [`@lockfile-affected/lockfile-pnpm`](packages/lockfile-pnpm) — pnpm-lock.yaml parser
 - [`@lockfile-affected/lockfile-npm`](packages/lockfile-npm) — package-lock.json parser
-- [`@lockfile-affected/lockfile-yarn`](packages/lockfile-yarn) — yarn.lock parser
+- [`@lockfile-affected/lockfile-yarn`](packages/lockfile-yarn) — yarn.lock parser (Yarn Berry v2+)
 - [`@lockfile-affected/lockfile-bun`](packages/lockfile-bun) — bun.lock parser
+
+## Development
+
+This project was developed with AI assistance.

@@ -1,0 +1,7 @@
+{
+  "name": "lib-c",
+  "version": "1.0.0",
+  "dependencies": {
+    "shared-dep": "^1.0.0"
+  }
+}

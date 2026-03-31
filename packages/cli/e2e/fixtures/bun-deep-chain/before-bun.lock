@@ -1,0 +1,44 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "deep-chain-test",
+      "dependencies": {
+        "express": "^4.18.0"
+      }
+    },
+    "packages/pkg-leaf": {
+      "name": "pkg-leaf",
+      "version": "1.0.0",
+      "dependencies": {
+        "express": "^4.18.0"
+      }
+    },
+    "packages/pkg-base": {
+      "name": "pkg-base",
+      "version": "1.0.0",
+      "dependencies": {
+        "pkg-leaf": "workspace:*"
+      }
+    },
+    "packages/pkg-middle": {
+      "name": "pkg-middle",
+      "version": "1.0.0",
+      "dependencies": {
+        "pkg-base": "workspace:*"
+      }
+    },
+    "packages/pkg-top": {
+      "name": "pkg-top",
+      "version": "1.0.0",
+      "dependencies": {
+        "pkg-middle": "workspace:*"
+      }
+    }
+  },
+  "packages": {
+    "express": ["express@4.18.0", "", {}, "sha512-express-4-18-0"],
+    "express@4.18.0": ["express@4.18.0", "", {}, "sha512-express-4-18-0"]
+  }
+}

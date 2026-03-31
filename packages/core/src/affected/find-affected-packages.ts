@@ -1,5 +1,5 @@
 import {
-  ALL_DEPENDENCY_TYPES,
+  allDependencyTypes,
   type DependencyFilter,
   type LockfileParser,
 } from '../types/lockfile.js';
@@ -36,5 +36,5 @@ export async function findAffectedPackages(
 
   const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
   const workspaceGraph = buildWorkspaceGraph(manifests);
-  return resolveAffectedPackages(diff, workspaceGraph, options.filter ?? ALL_DEPENDENCY_TYPES);
+  return resolveAffectedPackages(diff, workspaceGraph, options.filter ?? allDependencyTypes);
 }

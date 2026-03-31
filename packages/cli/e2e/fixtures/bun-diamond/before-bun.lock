@@ -1,0 +1,42 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "diamond-test"
+    },
+    "packages/lib-c": {
+      "name": "lib-c",
+      "version": "1.0.0",
+      "dependencies": {
+        "shared-dep": "^1.0.0"
+      }
+    },
+    "packages/lib-a": {
+      "name": "lib-a",
+      "version": "1.0.0",
+      "dependencies": {
+        "lib-c": "workspace:*"
+      }
+    },
+    "packages/lib-b": {
+      "name": "lib-b",
+      "version": "1.0.0",
+      "dependencies": {
+        "lib-c": "workspace:*"
+      }
+    },
+    "packages/app": {
+      "name": "app",
+      "version": "1.0.0",
+      "dependencies": {
+        "lib-a": "workspace:*",
+        "lib-b": "workspace:*"
+      }
+    }
+  },
+  "packages": {
+    "shared-dep": ["shared-dep@1.0.0", "", {}, "sha512-shared-dep-1-0-0"],
+    "shared-dep@1.0.0": ["shared-dep@1.0.0", "", {}, "sha512-shared-dep-1-0-0"]
+  }
+}

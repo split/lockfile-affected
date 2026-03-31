@@ -9,9 +9,11 @@ importers:
       lodash:
         specifier: ^4.17.0
         version: 4.17.21
-      react:
-        specifier: ^18.0.0
-        version: 18.2.0
+  packages/pkg-a:
+    dependencies:
+      lodash:
+        specifier: ^4.17.0
+        version: 4.17.20
 
 packages:
   lodash@4.17.21:
@@ -20,9 +22,9 @@ packages:
         integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w==,
       }
 
-  react@18.2.0:
+  lodash@4.17.20:
     resolution: { integrity: sha512-dummy }
 
 snapshots:
   lodash@4.17.21: {}
-  react@18.2.0: {}
+  lodash@4.17.20: {}

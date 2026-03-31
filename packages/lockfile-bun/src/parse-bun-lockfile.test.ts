@@ -52,25 +52,69 @@ const BUN_LOCK_FIXTURE = `\
 `;
 
 describe('parseBunLockfile', () => {
-  it('returns a snapshot with normalized package name -> version entries', async () => {
+  it('returns a hierarchical snapshot with root context', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
 
     expect(snapshot.size).toBeGreaterThan(0);
-    expect(snapshot.get('lodash')).toBe('4.17.21');
-    expect(snapshot.get('react')).toBe('18.3.0');
+    expect(snapshot.has('.')).toBe(true);
+
+    const rootPackages = snapshot.get('.');
+    expect(rootPackages?.get('lodash')).toBe('4.17.21');
+    expect(rootPackages?.get('react')).toBe('18.3.0');
   });
 
-  it('deduplicates package names and keeps first encountered version', async () => {
+  it('only includes direct dependencies (not transitive)', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
+    const rootPackages = snapshot.get('.');
 
-    expect(snapshot.get('loose-envify')).toBe('1.4.0');
-    expect(snapshot.get('js-tokens')).toBe('4.0.0');
+    expect(rootPackages?.get('lodash')).toBe('4.17.21');
+    expect(rootPackages?.get('react')).toBe('18.3.0');
+    expect(rootPackages?.get('loose-envify')).toBeUndefined();
+    expect(rootPackages?.get('js-tokens')).toBeUndefined();
   });
 
-  it('returns a LockfileSnapshot (ReadonlyMap)', async () => {
+  it('returns a LockfileSnapshot (ReadonlyMap of ReadonlyMaps)', async () => {
     const snapshot = await parseBunLockfile(BUN_LOCK_FIXTURE);
 
     expect(snapshot).toBeInstanceOf(Map);
+    expect(snapshot.get('.')).toBeInstanceOf(Map);
+  });
+
+  it('returns empty snapshot for empty workspaces', async () => {
+    const emptyLock = JSON.stringify({
+      lockfileVersion: 1,
+      packages: {},
+    });
+
+    const snapshot = await parseBunLockfile(emptyLock);
+    expect(snapshot.size).toBe(0);
+  });
+
+  it('extracts workspace packages into separate contexts', async () => {
+    const multiWorkspaceLock = JSON.stringify({
+      lockfileVersion: 1,
+      workspaces: {
+        '': {
+          name: 'root',
+          dependencies: { lodash: '^4.17.0' },
+        },
+        'packages/pkg-a': {
+          dependencies: { react: '^18.0.0' },
+        },
+      },
+      packages: {
+        lodash: ['lodash@4.17.21', '', {}],
+        react: ['react@18.2.0', '', {}],
+      },
+    });
+
+    const snapshot = await parseBunLockfile(multiWorkspaceLock);
+
+    expect(snapshot.has('.')).toBe(true);
+    expect(snapshot.has('packages/pkg-a')).toBe(true);
+
+    expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
+    expect(snapshot.get('packages/pkg-a')?.get('react')).toBe('18.2.0');
   });
 });
 
@@ -86,6 +130,6 @@ describe('bunLockfileParser', () => {
   it('parse delegates to parseBunLockfile', async () => {
     const snapshot = await bunLockfileParser.parse(BUN_LOCK_FIXTURE);
 
-    expect(snapshot.get('lodash')).toBe('4.17.21');
+    expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
   });
 });

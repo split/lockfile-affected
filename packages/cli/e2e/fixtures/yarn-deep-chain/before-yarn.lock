@@ -1,0 +1,40 @@
+# yarn.lock - Yarn Berry (v4) format
+
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"express@npm:^4.18.0":
+  version: 4.18.0
+  resolution: "express@npm:4.18.0"
+  checksum: sha512-express-4-18-0
+  languageName: node
+  linkType: hard
+
+"pkg-leaf@workspace:packages/pkg-leaf":
+  version: 1.0.0
+  resolution: "pkg-leaf@workspace:packages/pkg-leaf"
+  checksum: sha512-pkg-leaf
+  languageName: node
+  linkType: soft
+
+"pkg-base@workspace:packages/pkg-base":
+  version: 1.0.0
+  resolution: "pkg-base@workspace:packages/pkg-base"
+  checksum: sha512-pkg-base
+  languageName: node
+  linkType: soft
+
+"pkg-middle@workspace:packages/pkg-middle":
+  version: 1.0.0
+  resolution: "pkg-middle@workspace:packages/pkg-middle"
+  checksum: sha512-pkg-middle
+  languageName: node
+  linkType: soft
+
+"pkg-top@workspace:packages/pkg-top":
+  version: 1.0.0
+  resolution: "pkg-top@workspace:packages/pkg-top"
+  checksum: sha512-pkg-top
+  languageName: node
+  linkType: soft

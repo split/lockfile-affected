@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@lockfile-affected/core": "workspace:*",
-    "lockparse": "^0.5.0"
+    "yaml": "^2.0.0"
   },
   "devDependencies": {
     "vitest": "*",

@@ -7,7 +7,7 @@ export type {
   WorkspaceGraph,
   WorkspacePackage,
 } from './types/lockfile.js';
-export { ALL_DEPENDENCY_TYPES } from './types/lockfile.js';
+export { allDependencyTypes } from './types/lockfile.js';
 export { diffLockfileSnapshots } from './diff/diff-lockfile-snapshots.js';
 export { resolveAffectedPackages } from './affected/resolve-affected-packages.js';
 export { findAffectedPackages } from './affected/find-affected-packages.js';

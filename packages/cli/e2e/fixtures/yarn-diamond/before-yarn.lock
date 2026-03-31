@@ -1,0 +1,40 @@
+# yarn.lock - Yarn Berry (v4) format
+
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"shared-dep@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "shared-dep@npm:1.0.0"
+  checksum: sha512-shared-dep-1-0-0
+  languageName: node
+  linkType: hard
+
+"lib-c@workspace:packages/lib-c":
+  version: 1.0.0
+  resolution: "lib-c@workspace:packages/lib-c"
+  checksum: sha512-lib-c
+  languageName: node
+  linkType: soft
+
+"lib-a@workspace:packages/lib-a":
+  version: 1.0.0
+  resolution: "lib-a@workspace:packages/lib-a"
+  checksum: sha512-lib-a
+  languageName: node
+  linkType: soft
+
+"lib-b@workspace:packages/lib-b":
+  version: 1.0.0
+  resolution: "lib-b@workspace:packages/lib-b"
+  checksum: sha512-lib-b
+  languageName: node
+  linkType: soft
+
+"app@workspace:packages/app":
+  version: 1.0.0
+  resolution: "app@workspace:packages/app"
+  checksum: sha512-app
+  languageName: node
+  linkType: soft

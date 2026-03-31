@@ -8,21 +8,23 @@ importers:
     dependencies:
       lodash:
         specifier: ^4.17.0
-        version: 4.17.22
-      react:
-        specifier: ^18.0.0
-        version: 18.2.0
+        version: 4.17.21
+  packages/pkg-a:
+    dependencies:
+      lodash:
+        specifier: ^4.17.0
+        version: 4.17.25
 
 packages:
-  lodash@4.17.22:
+  lodash@4.17.21:
     resolution:
       {
-        integrity: sha512-nFEy64W3jilNPEu6HVMaaBW5jWCisB0xfpRx2u8tEDA8lWQV8mtawcoNQQqvFSPa+nakrUDA7Dsbl0RrXd7vDw==,
+        integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w==,
       }
 
-  react@18.2.0:
-    resolution: { integrity: sha512-dummy }
+  lodash@4.17.25:
+    resolution: { integrity: sha512-sha256-dummy }
 
 snapshots:
-  lodash@4.17.22: {}
-  react@18.2.0: {}
+  lodash@4.17.21: {}
+  lodash@4.17.25: {}

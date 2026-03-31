@@ -1,6 +1,26 @@
-# yarn lockfile v1
+# yarn.lock - Yarn Berry (v4) format
 
-lodash@^4.17.0:
-  version "4.17.23"
-  resolved "https://registry.Yarnpkg.com/lodash/-/lodash-4.17.23.tgz#f113b0378386103be4f6893388c73d0bde7f2c5a"
-  integrity sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"lodash@npm:^4.17.20":
+  version: 4.17.23
+  resolution: "lodash@npm:4.17.23"
+  checksum: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w==
+  languageName: node
+  linkType: hard
+
+"pkg-base@workspace:packages/pkg-base":
+  version: 1.0.0
+  resolution: "pkg-base@workspace:packages/pkg-base"
+  checksum: sha512-pkg-base-1-0-0
+  languageName: node
+  linkType: soft
+
+"pkg-middle@workspace:packages/pkg-middle":
+  version: 1.0.0
+  resolution: "pkg-middle@workspace:packages/pkg-middle"
+  checksum: sha512-pkg-middle-1-0-0
+  languageName: node
+  linkType: soft

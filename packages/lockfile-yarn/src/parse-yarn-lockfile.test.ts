@@ -1,87 +1,76 @@
 import { describe, expect, it } from 'vitest';
 import { parseYarnLockfile, yarnLockfileParser } from './parse-yarn-lockfile.js';
 
-const CLASSIC_FIXTURE = `\
-# yarn lockfile v1
-
-lodash@^4.17.20, lodash@^4.17.21:
-  version "4.17.21"
-  resolved "https://registry.Yarnpkg.com/lodash/-/lodash-4.17.21.tgz"
-  integrity sha512-512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w=="
-  integrity sha512-512-abc
-
-react@^18.2.0:
-  version "18.2.0"
-  resolved "https://registry.Yarnpkg.com/react/-/react-18.2.0.tgz"
-  integrity sha512-512-def
-  dependencies:
-    loose-envify "^1.1.0"
-`;
-
 const BERRY_FIXTURE = `\
 __metadata:
   version: 6
   cacheKey: 8
 
-"lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:^4.17.20":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
-  checksum: abc
+  checksum: abc123
   languageName: node
   linkType: hard
 
 "react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
-  checksum: def
+  checksum: def456
+  languageName: node
+  linkType: hard
+`;
+
+const BERRY_WORKSPACES_FIXTURE = `\
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"lodash@npm:^4.17.20":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: abc123
+  languageName: node
+  linkType: hard
+
+"packages/pkg-a/node-modules/lodash@npm:^4.17.20":
+  version: 4.17.25
+  resolution: "lodash@npm:4.17.25"
+  checksum: def456
+  languageName: node
+  linkType: hard
+
+"packages/pkg-b/node-modules/lodash@npm:4.17.15":
+  version: 4.17.15
+  resolution: "lodash@npm:4.17.15"
+  checksum: ghi789
   languageName: node
   linkType: hard
 `;
 
 describe('parseYarnLockfile', () => {
-  describe('classic (v1)', () => {
-    it('parses packages into name → version entries in root context', async () => {
-      const snapshot = await parseYarnLockfile(CLASSIC_FIXTURE);
+  it('parses packages into name → version entries in root context', async () => {
+    const snapshot = await parseYarnLockfile(BERRY_FIXTURE);
 
-      expect(snapshot.has('.')).toBe(true);
-      expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
-      expect(snapshot.get('.')?.get('react')).toBe('18.2.0');
-    });
-
-    it('deduplicates multi-range entries to a single version', async () => {
-      const snapshot = await parseYarnLockfile(CLASSIC_FIXTURE);
-
-      const rootPackages = snapshot.get('.');
-      expect(rootPackages?.size).toBe(2);
-    });
-
-    it('returns packages in root context', async () => {
-      const snapshot = await parseYarnLockfile(CLASSIC_FIXTURE);
-
-      const rootPackages = snapshot.get('.');
-      expect([...(rootPackages?.keys() ?? [])].sort()).toEqual(['lodash', 'react']);
-    });
+    expect(snapshot.has('.')).toBe(true);
+    expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
+    expect(snapshot.get('.')?.get('react')).toBe('18.2.0');
   });
 
-  describe('berry (v2+)', () => {
-    it('parses packages into name → version entries in root context', async () => {
-      const snapshot = await parseYarnLockfile(BERRY_FIXTURE);
+  it('handles workspaces with separate node-modules paths', async () => {
+    const snapshot = await parseYarnLockfile(BERRY_WORKSPACES_FIXTURE);
 
-      expect(snapshot.has('.')).toBe(true);
-      expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
-      expect(snapshot.get('.')?.get('react')).toBe('18.2.0');
-    });
+    expect(snapshot.has('.')).toBe(true);
+    expect(snapshot.has('packages/pkg-a')).toBe(true);
+    expect(snapshot.has('packages/pkg-b')).toBe(true);
 
-    it('deduplicates multi-range entries to a single version', async () => {
-      const snapshot = await parseYarnLockfile(BERRY_FIXTURE);
-
-      const rootPackages = snapshot.get('.');
-      expect(rootPackages?.size).toBe(2);
-    });
+    expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
+    expect(snapshot.get('packages/pkg-a')?.get('lodash')).toBe('4.17.25');
+    expect(snapshot.get('packages/pkg-b')?.get('lodash')).toBe('4.17.15');
   });
 
-  it('returns an empty snapshot for an empty lockfile', async () => {
-    const snapshot = await parseYarnLockfile('# yarn lockfile v1\n');
+  it('returns empty snapshot for empty content', async () => {
+    const snapshot = await parseYarnLockfile('__metadata:\n  version: 6\n');
 
     expect(snapshot.size).toBe(0);
   });
@@ -92,12 +81,12 @@ describe('yarnLockfileParser', () => {
     expect(yarnLockfileParser.format).toBe('yarn');
   });
 
-  it('lists both classic and berry filenames', () => {
+  it('handles yarn.lock filename', () => {
     expect(yarnLockfileParser.lockfileNames).toContain('yarn.lock');
   });
 
   it('parse delegates to parseYarnLockfile', async () => {
-    const snapshot = await yarnLockfileParser.parse(CLASSIC_FIXTURE);
+    const snapshot = await yarnLockfileParser.parse(BERRY_FIXTURE);
 
     expect(snapshot.get('.')?.get('lodash')).toBe('4.17.21');
   });

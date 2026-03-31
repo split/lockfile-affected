@@ -1,4 +1,5 @@
 # yarn.lock - Yarn Berry (v4) format
+# This demonstrates Yarn Berry's deduplication behavior
 
 __metadata:
   version: 6
@@ -11,16 +12,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pkg-base@workspace:packages/pkg-base":
+"lodash@npm:4.17.15":
+  version: 4.17.15
+  resolution: "lodash@npm:4.17.15"
+  checksum: sha512-abc123
+  languageName: node
+  linkType: hard
+
+"pkg-a@workspace:packages/pkg-a":
   version: 1.0.0
-  resolution: "pkg-base@workspace:packages/pkg-base"
-  checksum: sha512-pkg-base-1-0-0
+  resolution: "pkg-a@workspace:packages/pkg-a"
+  checksum: sha512-pkg-a
   languageName: node
   linkType: soft
 
-"pkg-middle@workspace:packages/pkg-middle":
+"pkg-b@workspace:packages/pkg-b":
   version: 1.0.0
-  resolution: "pkg-middle@workspace:packages/pkg-middle"
-  checksum: sha512-pkg-middle-1-0-0
+  resolution: "pkg-b@workspace:packages/pkg-b"
+  checksum: sha512-pkg-b
   languageName: node
   linkType: soft

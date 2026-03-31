@@ -10,9 +10,9 @@ interface NpmPackageEntry {
   dependencies?: Record<string, string>;
 }
 
-export async function parseNpmLockfile(content: string): Promise<LockfileSnapshot> {
+export function parseNpmLockfile(content: string): Promise<LockfileSnapshot> {
   const lockfile = JSON.parse(content) as NpmPackageLock;
-  return toSnapshot(lockfile);
+  return Promise.resolve(toSnapshot(lockfile));
 }
 
 function toSnapshot(lockfile: NpmPackageLock): LockfileSnapshot {

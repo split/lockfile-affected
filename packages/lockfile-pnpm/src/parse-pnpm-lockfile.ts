@@ -12,9 +12,9 @@ interface PnpmLockfile {
   importers: Record<string, PnpmImporter>;
 }
 
-export async function parsePnpmLockfile(content: string): Promise<LockfileSnapshot> {
+export function parsePnpmLockfile(content: string): Promise<LockfileSnapshot> {
   const parsed = YAML.parse(content) as PnpmLockfile;
-  return toSnapshot(parsed);
+  return Promise.resolve(toSnapshot(parsed));
 }
 
 function stripPeerSuffix(version: string): string {

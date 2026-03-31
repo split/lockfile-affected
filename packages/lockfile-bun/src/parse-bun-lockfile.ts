@@ -6,9 +6,9 @@ interface BunLockfile {
   packages: Record<string, string[]>;
 }
 
-export async function parseBunLockfile(content: string): Promise<LockfileSnapshot> {
+export function parseBunLockfile(content: string): Promise<LockfileSnapshot> {
   const parsed = jsoncParse(content) as BunLockfile;
-  return toSnapshot(parsed);
+  return Promise.resolve(toSnapshot(parsed));
 }
 
 function toSnapshot(lockfile: BunLockfile): LockfileSnapshot {

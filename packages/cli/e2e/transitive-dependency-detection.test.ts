@@ -3,17 +3,6 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { runAffectedCommand } from '../src/commands/run-affected-command.js';
 import type { CliOptions } from '../src/options/cli-options.types.js';
-import { resolveAffectedPackages, ALL_DEPENDENCY_TYPES } from '@lockfile-affected/core';
-import type { LockfileDiff, WorkspaceGraph } from '@lockfile-affected/core';
-
-function pkgWith(deps: { dependencies?: string[]; devDependencies?: string[] } = {}) {
-  return {
-    dependencies: new Set(deps.dependencies ?? []),
-    devDependencies: new Set(deps.devDependencies ?? []),
-    peerDependencies: new Set<string>(),
-    optionalDependencies: new Set<string>(),
-  };
-}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, '..');
@@ -172,64 +161,68 @@ describe('E2E: Per-importer detection (pnpm only)', () => {
   });
 });
 
-describe('E2E: Deep transitive dependency chain (4+ levels)', () => {
-  const fixturesDir = join(__dirname, 'fixtures', 'pnpm-deep-chain');
+describe.each(fixtures)(
+  'E2E: Deep transitive dependency chain ($name)',
+  ({ format, name, beforeLock, afterLock }) => {
+    const fixturesDir = join(__dirname, 'fixtures', `${name}-deep-chain`);
 
-  it('marks all packages affected when external dep changes at 4-level depth', async () => {
-    const workspaceRoot = join(fixturesDir, 'workspace');
-    const beforeLockfilePath = join(fixturesDir, 'before-pnpm-lock.yaml');
-    const afterLockfilePath = join(fixturesDir, 'after-pnpm-lock.yaml');
+    it('marks all packages affected when external dep changes at 4-level depth', async () => {
+      const workspaceRoot = join(fixturesDir, 'workspace');
+      const beforeLockfilePath = join(fixturesDir, beforeLock);
+      const afterLockfilePath = join(fixturesDir, afterLock);
 
-    const options: CliOptions = {
-      lockfileBefore: beforeLockfilePath,
-      lockfileAfter: afterLockfilePath,
-      workspaceRoot,
-      output: 'json',
-      format: 'pnpm',
-      deps: true,
-      dev: true,
-      peer: true,
-      optional: true,
-    };
+      const options: CliOptions = {
+        lockfileBefore: beforeLockfilePath,
+        lockfileAfter: afterLockfilePath,
+        workspaceRoot,
+        output: 'json',
+        format,
+        deps: true,
+        dev: true,
+        peer: true,
+        optional: true,
+      };
 
-    const result = await runAffectedCommand(options);
-    const affected = JSON.parse(result);
+      const result = await runAffectedCommand(options);
+      const affected = JSON.parse(result);
 
-    expect(affected).toContain('pkg-leaf');
-    expect(affected).toContain('pkg-base');
-    expect(affected).toContain('pkg-middle');
-    expect(affected).toContain('pkg-top');
-  });
-});
+      expect(affected).toContain('pkg-leaf');
+      expect(affected).toContain('pkg-base');
+      expect(affected).toContain('pkg-middle');
+      expect(affected).toContain('pkg-top');
+    });
+  },
+);
 
-describe('E2E: Diamond dependency graph', () => {
-  it('marks all packages that depend on changed package via multiple paths', () => {
-    const workspace: WorkspaceGraph = new Map([
-      ['app', { name: 'app', dependencyGroups: pkgWith({ dependencies: ['lib-a', 'lib-b'] }) }],
-      ['lib-a', { name: 'lib-a', dependencyGroups: pkgWith({ dependencies: ['lib-c'] }) }],
-      ['lib-b', { name: 'lib-b', dependencyGroups: pkgWith({ dependencies: ['lib-c'] }) }],
-      ['lib-c', { name: 'lib-c', dependencyGroups: pkgWith({ dependencies: ['shared-dep'] }) }],
-    ]);
-    const diff: LockfileDiff = {
-      addedContexts: new Map(),
-      removedContexts: new Map(),
-      changed: new Map([
-        [
-          '.',
-          {
-            added: new Map(),
-            removed: new Map(),
-            changed: new Map([['shared-dep', { from: '1.0.0', to: '2.0.0' }]]),
-          },
-        ],
-      ]),
-    };
+describe.each(fixtures)(
+  'E2E: Diamond dependency graph ($name)',
+  ({ format, name, beforeLock, afterLock }) => {
+    const fixturesDir = join(__dirname, 'fixtures', `${name}-diamond`);
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    it('marks all packages affected when shared dep changes', async () => {
+      const workspaceRoot = join(fixturesDir, 'workspace');
+      const beforeLockfilePath = join(fixturesDir, beforeLock);
+      const afterLockfilePath = join(fixturesDir, afterLock);
 
-    expect(affected.has('lib-c')).toBe(true);
-    expect(affected.has('lib-a')).toBe(true);
-    expect(affected.has('lib-b')).toBe(true);
-    expect(affected.has('app')).toBe(true);
-  });
-});
+      const options: CliOptions = {
+        lockfileBefore: beforeLockfilePath,
+        lockfileAfter: afterLockfilePath,
+        workspaceRoot,
+        output: 'json',
+        format,
+        deps: true,
+        dev: true,
+        peer: true,
+        optional: true,
+      };
+
+      const result = await runAffectedCommand(options);
+      const affected = JSON.parse(result);
+
+      expect(affected).toContain('lib-c');
+      expect(affected).toContain('lib-a');
+      expect(affected).toContain('lib-b');
+      expect(affected).toContain('app');
+    });
+  },
+);

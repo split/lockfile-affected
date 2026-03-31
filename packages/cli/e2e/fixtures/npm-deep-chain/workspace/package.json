@@ -1,0 +1,7 @@
+{
+  "name": "deep-chain-test",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

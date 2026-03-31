@@ -1,0 +1,7 @@
+{
+  "name": "diamond-test",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

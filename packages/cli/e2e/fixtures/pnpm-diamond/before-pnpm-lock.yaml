@@ -1,0 +1,34 @@
+lockfileVersion: '9.0'
+
+metadata:
+  packageManager: pnpm@9.15.9
+
+importers:
+  .: {}
+  packages/lib-c:
+    dependencies:
+      shared-dep:
+        specifier: ^1.0.0
+        version: 1.0.0
+  packages/lib-a:
+    dependencies:
+      lib-c:
+        specifier: workspace:*
+        version: 1.0.0
+  packages/lib-b:
+    dependencies:
+      lib-c:
+        specifier: workspace:*
+        version: 1.0.0
+  packages/app:
+    dependencies:
+      lib-a:
+        specifier: workspace:*
+        version: 1.0.0
+      lib-b:
+        specifier: workspace:*
+        version: 1.0.0
+
+packages:
+  shared-dep@1.0.0:
+    resolution: { integrity: sha512-sha-shared-dep-1-0-0 }

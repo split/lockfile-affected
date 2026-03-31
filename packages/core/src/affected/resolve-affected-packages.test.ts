@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_DEPENDENCY_TYPES, type LockfileDiff, type WorkspaceGraph } from '../types/lockfile.js';
+import { allDependencyTypes, type LockfileDiff, type WorkspaceGraph } from '../types/lockfile.js';
 import { resolveAffectedPackages } from './resolve-affected-packages.js';
 
 const emptyDiff: LockfileDiff = {
@@ -28,7 +28,7 @@ describe('resolveAffectedPackages', () => {
       ['app', { name: 'app', dependencyGroups: pkgWith({ dependencies: ['lodash'] }) }],
     ]);
 
-    const affected = resolveAffectedPackages(emptyDiff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(emptyDiff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(0);
   });
@@ -52,7 +52,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(1);
     expect(affected.has('app')).toBe(true);
@@ -77,7 +77,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.has('app')).toBe(true);
   });
@@ -177,7 +177,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(2);
     expect(affected.has('app-a')).toBe(true);
@@ -203,7 +203,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(0);
   });
@@ -231,7 +231,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(3);
     expect(affected.has('pkg-base')).toBe(true);
@@ -258,7 +258,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.has('pkg-a')).toBe(true);
     expect(affected.has('pkg-b')).toBe(true);
@@ -309,7 +309,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.has('lib-c')).toBe(true);
     expect(affected.has('lib-a')).toBe(true);
@@ -340,7 +340,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(2);
     expect(affected.has('pkg-a')).toBe(true);
@@ -370,7 +370,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(3);
     expect(affected.has('pkg-a')).toBe(true);
@@ -399,7 +399,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(1);
     expect(affected.has('pkg-a')).toBe(true);
@@ -428,7 +428,7 @@ describe('resolveAffectedPackages', () => {
       ]),
     };
 
-    const affected = resolveAffectedPackages(diff, workspace, ALL_DEPENDENCY_TYPES);
+    const affected = resolveAffectedPackages(diff, workspace, allDependencyTypes);
 
     expect(affected.size).toBe(3);
     expect(affected.has('pkg-a')).toBe(true);

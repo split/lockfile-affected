@@ -186,9 +186,9 @@ importers:
       '@lockfile-affected/core':
         specifier: workspace:*
         version: link:../core
-      lockparse:
-        specifier: ^0.5.0
-        version: 0.5.0
+      yaml:
+        specifier: ^2.0.0
+        version: 2.8.3
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -1590,9 +1590,6 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
-
-  lockparse@0.5.0:
-    resolution: {integrity: sha512-seaI91ZVc4mnEGL+/cEEd5MybTnb86NH3W5lM0Ft7CMCZsLP5z1orWnu8g7YacpiMc5GxU7wIrYLhb6W2DvNWg==}
 
   lodash-es@4.17.23:
     resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
@@ -3948,8 +3945,6 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
-
-  lockparse@0.5.0: {}
 
   lodash-es@4.17.23: {}
 

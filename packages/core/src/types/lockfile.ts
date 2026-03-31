@@ -60,7 +60,7 @@ export type DependencyFilter = {
 };
 
 /** A DependencyFilter that includes all dependency types. */
-export const ALL_DEPENDENCY_TYPES: DependencyFilter = {
+export const allDependencyTypes: DependencyFilter = {
   dependencies: true,
   devDependencies: true,
   peerDependencies: true,

@@ -16,10 +16,7 @@ export function sortTopologically(packages: ReadonlySet<string>, graph: Workspac
     const pkgInfo = graph.get(pkg);
     if (!pkgInfo) continue;
 
-    const deps = [
-      ...pkgInfo.dependencyGroups.dependencies,
-      ...pkgInfo.dependencyGroups.devDependencies,
-    ];
+    const deps = [...pkgInfo.dependencyGroups.dependencies];
 
     for (const dep of deps) {
       if (affected.includes(dep)) {

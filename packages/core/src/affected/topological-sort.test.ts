@@ -71,13 +71,13 @@ describe('sortTopologically', () => {
     expect(result).toEqual(['core', 'lib-a', 'lib-b', 'app']);
   });
 
-  it('considers devDependencies in topological sort', () => {
+  it('only considers production dependencies in topological sort', () => {
     const graph: WorkspaceGraph = new Map([
       ['app', pkgWith({ devDependencies: ['utils'] })],
       ['utils', pkgWith({})],
     ]);
     const result = sortTopologically(new Set(['app', 'utils']), graph);
-    expect(result).toEqual(['utils', 'app']);
+    expect(result).toEqual(['app', 'utils']);
   });
 
   it('handles packages not in graph (external dependencies)', () => {

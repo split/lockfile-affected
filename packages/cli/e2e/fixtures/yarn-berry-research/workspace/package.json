@@ -1,8 +1,0 @@
-{
-  "name": "yarn-berry-research",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "packageManager": "yarn@4.0.0"
-}

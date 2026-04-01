@@ -1,5 +1,7 @@
 # @lockfile-affected/lockfile-yarn
 
+> **Warning:** This tool is still in early development. The API may change, and some features are incomplete or not yet fully tested. Use in production at your own risk.
+
 `yarn.lock` adapter for [`lockfile-affected`](https://www.npmjs.com/package/lockfile-affected).
 
 Supports both classic (v1) and berry (v2+) lockfile formats.

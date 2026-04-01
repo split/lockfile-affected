@@ -1,5 +1,7 @@
 # @lockfile-affected/core
 
+> **Warning:** This tool is still in early development. The API may change, and some features are incomplete or not yet fully tested. Use in production at your own risk.
+
 Diff engine, affected-package resolver, and programmatic API for `lockfile-affected`.
 
 ## Installation

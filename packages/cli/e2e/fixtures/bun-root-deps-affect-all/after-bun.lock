@@ -1,0 +1,26 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "test-monorepo",
+      "dependencies": {
+        "lodash": "^4.17.0"
+      },
+      "devDependencies": {
+        "vitest": "^1.0.0"
+      }
+    },
+    "packages/pkg-a": {
+      "name": "pkg-a",
+      "version": "1.0.0",
+      "dependencies": {}
+    }
+  },
+  "packages": {
+    "lodash": ["lodash@4.17.22", "", {}, "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w=="],
+    "lodash@4.17.22": ["lodash@4.17.22", "", {}, "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w=="],
+    "vitest": ["vitest@1.0.0", "", {}, "sha512-dummy"],
+    "vitest@1.0.0": ["vitest@1.0.0", "", {}, "sha100-dummy"]
+  }
+}

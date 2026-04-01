@@ -1,5 +1,7 @@
 # @lockfile-affected/lockfile-bun
 
+> **Warning:** This tool is still in early development. The API may change, and some features are incomplete or not yet fully tested. Use in production at your own risk.
+
 bun.lock adapter for [`lockfile-affected`](https://www.npmjs.com/package/lockfile-affected).
 
 Parses `bun.lock` content into a normalized `name -> version` snapshot

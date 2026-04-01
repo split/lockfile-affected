@@ -23,7 +23,7 @@ export function sortTopologically(packages: ReadonlySet<string>, graph: Workspac
 
     for (const dep of deps) {
       if (affected.includes(dep)) {
-        adjacency.get(pkg)!.push(dep);
+        adjacency.get(dep)!.push(pkg);
         inDegree.set(pkg, (inDegree.get(pkg) ?? 0) + 1);
       }
     }
@@ -43,6 +43,13 @@ export function sortTopologically(packages: ReadonlySet<string>, graph: Workspac
       const newDegree = (inDegree.get(dependent) ?? 1) - 1;
       inDegree.set(dependent, newDegree);
       if (newDegree === 0) queue.push(dependent);
+    }
+  }
+
+  const remaining = inDegree.size - result.length;
+  if (remaining > 0) {
+    for (const pkg of affected) {
+      if (!result.includes(pkg)) result.push(pkg);
     }
   }
 

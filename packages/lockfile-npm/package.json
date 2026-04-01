@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/lockfile-npm",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "package-lock.json adapter for lockfile-affected",
   "keywords": [
     "npm",

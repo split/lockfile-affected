@@ -5,6 +5,8 @@ import {
 
 const currentPackageName = readPackageName(process.cwd());
 
+const shortName = currentPackageName.replace('@lockfile-affected/', '');
+
 const config = {
   branches: ['main'],
   repositoryUrl: 'https://github.com/split/lockfile-affected',
@@ -14,7 +16,7 @@ const config = {
     [
       '@semantic-release/exec',
       {
-        prepareCmd: 'npm version ${nextRelease.version} --no-git-tag-version',
+        prepareCmd: `pnpm version \${nextRelease.version} --no-git-tag-version --message "chore(release): ${shortName} \${nextRelease.version} [skip ci]"`,
         publishCmd: 'pnpm publish --access public',
       },
     ],

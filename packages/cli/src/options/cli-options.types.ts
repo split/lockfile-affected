@@ -26,4 +26,6 @@ export type CliOptions = {
   readonly optional: boolean;
   /** When enabled, root dependency changes affect all workspace packages */
   readonly rootDepsAffectAll?: boolean;
+  /** Output order for affected packages */
+  readonly order?: 'alphabetical' | 'topological';
 };

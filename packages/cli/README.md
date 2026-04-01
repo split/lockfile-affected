@@ -69,6 +69,7 @@ Format is auto-detected from content, or use `--format` to override.
 --optional                 Include optional dependencies
                             (when no dep flags are set, all types are included)
 --root-deps-affect-all     Treat root dependency changes as affecting all packages
+--order <alphabetical|topological> Output order (default: alphabetical)
 --help                     Show help
 ```
 

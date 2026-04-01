@@ -17,6 +17,7 @@ Options:
   --optional            Include optional dependencies
                         (when no dep flags are set, all types are included)
   --root-deps-affect-all Treat root dependency changes as affecting all packages
+  --order <order>       Output order: alphabetical (default) or topological
   --help                Show this help message
 `;
 
@@ -37,6 +38,7 @@ export function parseCliArgs(args: readonly string[]): ParseCliArgsResult {
   let peer = false;
   let optional = false;
   let rootDepsAffectAll = false;
+  let order: 'alphabetical' | 'topological' | undefined;
 
   const iter = args[Symbol.iterator]();
   for (const arg of iter) {
@@ -54,6 +56,13 @@ export function parseCliArgs(args: readonly string[]): ParseCliArgsResult {
       optional = true;
     } else if (arg === '--root-deps-affect-all') {
       rootDepsAffectAll = true;
+    } else if (arg === '--order') {
+      const { value, done } = iter.next();
+      if (done || !value) throw new Error('--order requires a value');
+      if (value !== 'alphabetical' && value !== 'topological') {
+        throw new Error('--order must be "alphabetical" or "topological"');
+      }
+      order = value;
     } else if (arg === '--workspace') {
       const { value, done } = iter.next();
       if (done || !value) throw new Error('--workspace requires a path argument');
@@ -93,6 +102,7 @@ export function parseCliArgs(args: readonly string[]): ParseCliArgsResult {
       peer,
       optional,
       rootDepsAffectAll,
+      ...(order !== undefined && { order }),
     },
   };
 }

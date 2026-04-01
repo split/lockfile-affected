@@ -217,15 +217,10 @@ export function formatReleasePlan(analysisResult) {
   }
 
   lines.push('**Packages to release:**');
-  for (const pkg of analysisResult.packages) {
-    const reason = pkg.reason || 'changes';
-    lines.push(`- ${pkg.name} - ${reason}`);
-  }
-
-  lines.push('');
-  lines.push('**Release order (topological):**');
   for (let i = 0; i < analysisResult.packages.length; i++) {
-    lines.push(`${i + 1}. ${analysisResult.packages[i].name}`);
+    const pkg = analysisResult.packages[i];
+    const reason = pkg.reason || 'changes';
+    lines.push(`${i + 1}. ${pkg.name} - ${reason}`);
   }
 
   return lines.join('\n');

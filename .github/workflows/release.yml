@@ -3,6 +3,13 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      execute:
+        description: 'Execute release (leave empty for preview)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -11,7 +18,69 @@ permissions:
   id-token: write
 
 jobs:
+  analyze:
+    name: Analyze Release Plan
+    runs-on: ubuntu-latest
+    outputs:
+      has_releases: ${{ steps.analyze.outputs.has_releases }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Analyze release plan
+        id: analyze
+        run: |
+          PLAN=$(node scripts/release/analyze-packages.js)
+
+          echo "$PLAN" >> $GITHUB_STEP_SUMMARY
+          echo "plan=$PLAN" >> $GITHUB_OUTPUT
+
+          # Check if there are packages to release
+          if echo "$PLAN" | grep -q "No packages need releasing"; then
+            echo "has_releases=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_releases=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Show preview message
+        if: github.event_name == 'push'
+        run: |
+          echo "## 🔔 Preview Mode"
+          echo ""
+          echo "This is a preview. To execute the release:"
+          echo "1. Go to Actions → Release → Run workflow"
+          echo "2. Enable 'Execute release'"
+          echo "3. Run workflow"
+
+      - name: Show execute message
+        if: github.event_name == 'workflow_dispatch' && !inputs.execute
+        run: |
+          echo "## 🔔 Preview Mode"
+          echo ""
+          echo "This is a preview. To execute the release:"
+          echo "1. Re-run this workflow"
+          echo "2. Enable 'Execute release'"
+          echo "3. Run workflow"
+
   release:
+    needs: analyze
+    if: needs.analyze.outputs.has_releases == 'true' && (github.event_name == 'workflow_dispatch' && inputs.execute == true)
     name: Release
     runs-on: ubuntu-latest
     steps:

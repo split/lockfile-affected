@@ -25,13 +25,19 @@ pnpm add -D lockfile-affected
 
 ## Usage
 
-Pass the before and after lockfile snapshots as arguments:
+Pass the before and after lockfile snapshots as arguments. Use shell process
+substitution to avoid temp files:
 
 ```sh
-lockfile-affected pnpm-lock.yaml.old pnpm-lock.yaml
+# Compare against a specific branch
+lockfile-affected <(git show origin/main:pnpm-lock.yaml) pnpm-lock.yaml
+
+# Compare against the merge base (typical CI usage)
+BASE=$(git merge-base HEAD origin/main)
+lockfile-affected <(git show $BASE:pnpm-lock.yaml) pnpm-lock.yaml
 ```
 
-Works with pnpm, npm, Yarn Berry (v2+), and Bun text lockfiles (`bun.lock`).
+Works with pnpm, npm, Yarn Berry (v2+), and Bun lockfiles (`bun.lock`).
 
 For full Git and CI usage patterns, see the CLI guide:
 [`packages/cli/README.md`](packages/cli/README.md).

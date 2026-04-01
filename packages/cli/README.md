@@ -54,19 +54,21 @@ Or pipe the before snapshot via stdin using `-` (works with `npx`):
 git show origin/main:pnpm-lock.yaml | npx lockfile-affected - pnpm-lock.yaml
 ```
 
-Works with pnpm, npm, yarn (classic v1 and berry v2+), and Bun text lockfiles (`bun.lock`).
+Works with pnpm, npm, yarn (classic v1 and berry v2+), and Bun lockfiles (`bun.lock`).
+Format is auto-detected from content, or use `--format` to override.
 
 ## Options
 
 ```
 --workspace <path>         Root directory to search for package.json files (defaults to cwd)
---format <pnpm|npm|yarn|bun> Lockfile format override (auto-detected by default)
+--format <pnpm|npm|yarn|bun> Lockfile format override (auto-detected from content by default)
 --json                     Output as a JSON array instead of newline-separated
 --deps                     Include production dependencies
 --dev                      Include dev dependencies
 --peer                     Include peer dependencies
 --optional                 Include optional dependencies
-                           (when no dep flags are set, all types are included)
+                            (when no dep flags are set, all types are included)
+--root-deps-affect-all     Treat root dependency changes as affecting all packages
 --help                     Show help
 ```
 

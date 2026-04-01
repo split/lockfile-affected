@@ -14,37 +14,43 @@ npm install @lockfile-affected/core
 
 ### `findAffectedPackages(options)` - high-level entry point
 
-Parses two lockfile snapshots, diffs them, loads workspace manifests from disk,
-and returns the names of affected packages. This is the primary API for
-programmatic use.
+Diffs two lockfile snapshots and returns the names of affected packages.
+Caller is responsible for parsing lockfiles and loading manifests.
 
 ```ts
-import { findAffectedPackages } from '@lockfile-affected/core';
+import { findAffectedPackages, loadWorkspaceManifests } from '@lockfile-affected/core';
 import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
 
-const affected = await findAffectedPackages({
-  beforeContent: fs.readFileSync('pnpm-lock.yaml.old', 'utf-8'),
-  afterContent: fs.readFileSync('pnpm-lock.yaml', 'utf-8'),
-  parser: pnpmLockfileParser,
-  workspaceRoot: process.cwd(),
-  // filter: { dependencies: true, devDependencies: true } - optional
+const [snapshotBefore, snapshotAfter, manifests] = await Promise.all([
+  pnpmLockfileParser.parse(fs.readFileSync('pnpm-lock.yaml.old', 'utf-8')),
+  pnpmLockfileParser.parse(fs.readFileSync('pnpm-lock.yaml', 'utf-8')),
+  loadWorkspaceManifests(process.cwd()),
+]);
+
+const affected = findAffectedPackages({
+  snapshotBefore,
+  snapshotAfter,
+  manifests,
+  // filter: { dependencies: true } - optional
+  // rootDepsAffectAll: true - optional
 });
 // ReadonlySet<string> of affected package names
 ```
 
-### `detectLockfile(dir, parsers)`
+### `detectLockfile(content, parsers)`
 
-Finds the first known lockfile in `dir` by checking each parser's `lockfileNames`.
+Detects the lockfile format by trying each parser's `detect` method.
 
 ```ts
 import { detectLockfile } from '@lockfile-affected/core';
 import { pnpmLockfileParser, npmLockfileParser, yarnLockfileParser } from '...';
 
-const { format, path } = await detectLockfile(process.cwd(), [
+const format = detectLockfile(lockfileContent, [
   pnpmLockfileParser,
   npmLockfileParser,
   yarnLockfileParser,
 ]);
+// format: "pnpm" | "npm" | "yarn" | "bun"
 ```
 
 ### `loadWorkspaceManifests(dir)`
@@ -68,9 +74,9 @@ These primitives are useful for building custom pipelines.
 import { diffLockfileSnapshots } from '@lockfile-affected/core';
 
 const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
-// diff.added   - Map<name, newVersion>
-// diff.removed - Map<name, oldVersion>
-// diff.changed - Map<name, { from, to }>
+// diff.addedContexts - Map<context, Map<name, version>>
+// diff.removedContexts - Map<context, Map<name, version>>
+// diff.changed - Map<context, { added, removed, changed }>
 ```
 
 ### `resolveAffectedPackages(diff, workspaceGraph, filter?)`
@@ -103,16 +109,26 @@ type DependencyFilter = {
 
 type LockfileParser = {
   format: string;
-  lockfileNames: readonly string[];
+  lockfileNames?: readonly string[];
+  detect: (content: string) => boolean;
   parse: (content: string) => Promise<LockfileSnapshot>;
 };
 
-type LockfileSnapshot = ReadonlyMap<string, string>;
+// Maps context (workspace path) to package name -> resolved version
+// e.g., "." for root, "packages/pkg-a" for workspace packages
+type LockfileSnapshot = ReadonlyMap<string, ReadonlyMap<string, string>>;
 
 type LockfileDiff = {
-  added: ReadonlyMap<string, string>;
-  removed: ReadonlyMap<string, string>;
-  changed: ReadonlyMap<string, { from: string; to: string }>;
+  addedContexts: ReadonlyMap<string, ReadonlyMap<string, string>>;
+  removedContexts: ReadonlyMap<string, ReadonlyMap<string, string>>;
+  changed: ReadonlyMap<
+    string,
+    {
+      added: ReadonlyMap<string, string>;
+      removed: ReadonlyMap<string, string>;
+      changed: ReadonlyMap<string, { from: string; to: string }>;
+    }
+  >;
 };
 ```
 

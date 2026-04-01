@@ -37,7 +37,7 @@ export async function findAffectedPackages(
   ]);
 
   const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
-  const workspaceGraph = buildWorkspaceGraph(manifests, snapshotAfter);
+  const workspaceGraph = buildWorkspaceGraph(manifests);
 
   if (options.rootDepsAffectAll) {
     const resolveOptions = {

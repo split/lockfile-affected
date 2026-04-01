@@ -1,9 +1,4 @@
-import {
-  detectLockfile,
-  findAffectedPackages,
-  type LockfileParser,
-  type DependencyFilter,
-} from '@lockfile-affected/core';
+import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
 import {
   isSupportedFormat,
   lockfileParsers,

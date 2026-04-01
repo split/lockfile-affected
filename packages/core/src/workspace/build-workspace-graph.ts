@@ -1,9 +1,4 @@
-import type {
-  DependencyGroups,
-  LockfileSnapshot,
-  WorkspaceGraph,
-  WorkspacePackage,
-} from '../types/lockfile.js';
+import type { DependencyGroups, WorkspaceGraph, WorkspacePackage } from '../types/lockfile.js';
 
 /**
  * Shape of a package.json relevant to building the workspace graph.
@@ -21,10 +16,7 @@ export type PackageManifest = {
  * Packages without a name field are ignored.
  * Each dependency type is kept in its own group to allow fine-grained filtering.
  */
-export function buildWorkspaceGraph(
-  manifests: readonly PackageManifest[],
-  lockfileSnapshot?: LockfileSnapshot,
-): WorkspaceGraph {
+export function buildWorkspaceGraph(manifests: readonly PackageManifest[]): WorkspaceGraph {
   const graph = new Map<string, WorkspacePackage>();
 
   for (const manifest of manifests) {

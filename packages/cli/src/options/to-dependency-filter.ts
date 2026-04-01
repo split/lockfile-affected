@@ -1,4 +1,4 @@
-import { allDependencyTypes, type DependencyFilter } from '@lockfile-affected/core';
+import { type DependencyFilter } from '@lockfile-affected/core';
 import type { CliOptions } from './cli-options.types.js';
 
 /**

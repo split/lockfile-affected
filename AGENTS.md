@@ -30,3 +30,9 @@ pnpm test && pnpm typecheck && pnpm format:check && pnpm lint
 ```
 
 Write tests before implementation. One logical change per commit.
+
+If CLI or API changes are made, update the relevant README files:
+
+- CLI changes → `packages/cli/README.md`
+- Core API changes → `packages/core/README.md`
+- Root-level changes → `README.md`

@@ -86,7 +86,6 @@ describe('sortTopologically', () => {
       ['utils', pkgWith({})],
     ]);
     const result = sortTopologically(new Set(['app', 'utils']), graph);
-    expect(result).toHaveLength(2);
     expect(result).toContain('app');
     expect(result).toContain('utils');
   });

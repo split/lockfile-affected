@@ -1,5 +1,7 @@
 # @lockfile-affected/lockfile-pnpm
 
+> **Warning:** This tool is still in early development. The API may change, and some features are incomplete or not yet fully tested. Use in production at your own risk.
+
 `pnpm-lock.yaml` adapter for [`lockfile-affected`](https://www.npmjs.com/package/lockfile-affected).
 
 ## Minimal usage

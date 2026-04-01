@@ -1,7 +1,9 @@
 import {
+  buildWorkspaceGraph,
   detectLockfile,
   findAffectedPackages,
   loadWorkspaceManifests,
+  sortTopologically,
 } from '@lockfile-affected/core';
 import {
   isSupportedFormat,
@@ -54,6 +56,9 @@ export async function runAffectedCommand(options: CliOptions): Promise<string> {
     ...(options.rootDepsAffectAll && { rootDepsAffectAll: true }),
   });
 
-  const sortedAffected = Array.from(affected).sort();
+  const sortedAffected =
+    options.order === 'topological'
+      ? sortTopologically(affected, buildWorkspaceGraph(manifests))
+      : Array.from(affected).sort();
   return formatAffectedOutput(sortedAffected, options.output);
 }

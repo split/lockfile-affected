@@ -58,9 +58,9 @@
     "@lockfile-affected/lockfile-yarn": "workspace:*"
   },
   "devDependencies": {
-    "vitest": "*",
-    "@vitest/coverage-v8": "*",
     "@types/node": "^22.0.0",
-    "typescript": "^5.7.0"
+    "@vitest/coverage-v8": "*",
+    "typescript": "^5.7.0",
+    "vitest": "*"
   }
 }

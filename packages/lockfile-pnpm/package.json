@@ -1,6 +1,6 @@
 {
   "name": "@lockfile-affected/lockfile-pnpm",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "pnpm-lock.yaml adapter for lockfile-affected",
   "keywords": [
     "pnpm",

@@ -1,18 +1,6 @@
-import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
-import { bunLockfileParser } from '@lockfile-affected/lockfile-bun';
-import { npmLockfileParser } from '@lockfile-affected/lockfile-npm';
-import { pnpmLockfileParser } from '@lockfile-affected/lockfile-pnpm';
-import { yarnLockfileParser } from '@lockfile-affected/lockfile-yarn';
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-
-const parsersMap = {
-  pnpm: pnpmLockfileParser,
-  npm: npmLockfileParser,
-  yarn: yarnLockfileParser,
-  bun: bunLockfileParser,
-};
 
 function toGitPath(filePath) {
   return filePath.split(path.sep).join('/');
@@ -120,36 +108,6 @@ function getCommitsSinceTag(cwd, tag) {
   return output.split('\n').filter(Boolean);
 }
 
-async function findAffectedPackagesForLockfile(gitRoot, commitHash, lockfilePath, parser) {
-  let beforeContent, afterContent;
-  try {
-    beforeContent = execFileSync('git', ['show', `${commitHash}^:${lockfilePath}`], {
-      cwd: gitRoot,
-      encoding: 'utf-8',
-    });
-  } catch {
-    return new Set();
-  }
-
-  try {
-    afterContent = execFileSync('git', ['show', `${commitHash}:${lockfilePath}`], {
-      cwd: gitRoot,
-      encoding: 'utf-8',
-    });
-  } catch {
-    return new Set();
-  }
-
-  const affected = await findAffectedPackages({
-    beforeContent,
-    afterContent,
-    parser,
-    workspaceRoot: gitRoot,
-  });
-
-  return new Set(affected);
-}
-
 function analyzeCommitsForPackage(gitRoot, packagePath, commits) {
   const packageCommitHashes = new Set();
 
@@ -187,43 +145,6 @@ export async function analyzeReleases(cwd = process.cwd()) {
         commitHashes: [...commitHashes],
         reason: 'direct changes',
       });
-    }
-  }
-
-  let detectedLockfile;
-  try {
-    detectedLockfile = await detectLockfile(gitRoot, Object.values(parsersMap));
-  } catch {
-    // No lockfile detected
-  }
-
-  if (detectedLockfile) {
-    const parser = parsersMap[detectedLockfile.format];
-    const lockfilePath = toGitPath(path.relative(gitRoot, detectedLockfile.path));
-
-    for (const commitLine of allCommits) {
-      const commitHash = commitLine.split(' ')[0];
-      const files = getChangedFiles(gitRoot, commitHash);
-
-      if (files.includes(lockfilePath)) {
-        const affected = await findAffectedPackagesForLockfile(
-          gitRoot,
-          commitHash,
-          lockfilePath,
-          parser,
-        );
-
-        for (const packageName of affected) {
-          if (!packagesWithDirectChanges.has(packageName)) {
-            packagesWithDirectChanges.add(packageName);
-            packageDetails.set(packageName, {
-              ...workspacePackages.find((p) => p.name === packageName),
-              commitHashes: [commitHash],
-              reason: 'lockfile impact',
-            });
-          }
-        }
-      }
     }
   }
 

@@ -1,0 +1,7 @@
+{
+  "name": "transitive-external-test",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

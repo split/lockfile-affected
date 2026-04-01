@@ -1,0 +1,30 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "transitive-external-test",
+      "dependencies": {
+        "lodash": "^4.17.0"
+      }
+    },
+    "packages/pkg-a": {
+      "name": "pkg-a",
+      "version": "1.0.0",
+      "dependencies": {
+        "lodash": "^4.17.0"
+      }
+    },
+    "packages/pkg-b": {
+      "name": "pkg-b",
+      "version": "1.0.0",
+      "dependencies": {
+        "pkg-a": "1.0.0"
+      }
+    }
+  },
+  "packages": {
+    "lodash": ["lodash@4.17.20", "", {}, "sha512-dummy"],
+    "lodash@4.17.20": ["lodash@4.17.20", "", {}, "sha512-dummy"]
+  }
+}

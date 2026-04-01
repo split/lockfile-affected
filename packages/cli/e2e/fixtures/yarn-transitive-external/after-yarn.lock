@@ -1,0 +1,26 @@
+# yarn.lock - Yarn Berry (v4) format
+
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"lodash@npm:^4.17.0":
+  version: 4.18.0
+  resolution: "lodash@npm:4.18.0"
+  checksum: sha512-dummy
+  languageName: node
+  linkType: hard
+
+"pkg-a@workspace:packages/pkg-a":
+  version: 1.0.0
+  resolution: "pkg-a@workspace:packages/pkg-a"
+  checksum: sha512-pkg-a-1-0-0
+  languageName: node
+  linkType: soft
+
+"pkg-b@workspace:packages/pkg-b":
+  version: 1.0.0
+  resolution: "pkg-b@workspace:packages/pkg-b"
+  checksum: sha512-pkg-b-1-0-0
+  languageName: node
+  linkType: soft

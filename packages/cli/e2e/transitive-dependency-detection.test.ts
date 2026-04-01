@@ -162,6 +162,37 @@ describe('E2E: Per-importer detection (pnpm only)', () => {
 });
 
 describe.each(fixtures)(
+  'E2E: Transitive external dependency ($name)',
+  ({ format, name, beforeLock, afterLock }) => {
+    const fixturesDir = join(__dirname, 'fixtures', `${name}-transitive-external`);
+
+    it('detects affected workspace packages when external dep changes in transitive workspace dependency', async () => {
+      const workspaceRoot = join(fixturesDir, 'workspace');
+      const beforeLockfilePath = join(fixturesDir, beforeLock);
+      const afterLockfilePath = join(fixturesDir, afterLock);
+
+      const options: CliOptions = {
+        lockfileBefore: beforeLockfilePath,
+        lockfileAfter: afterLockfilePath,
+        workspaceRoot,
+        output: 'json',
+        format,
+        deps: true,
+        dev: true,
+        peer: true,
+        optional: true,
+      };
+
+      const result = await runAffectedCommand(options);
+      const affected = JSON.parse(result);
+
+      expect(affected).toContain('pkg-a');
+      expect(affected).toContain('pkg-b');
+    });
+  },
+);
+
+describe.each(fixtures)(
   'E2E: Deep transitive dependency chain ($name)',
   ({ format, name, beforeLock, afterLock }) => {
     const fixturesDir = join(__dirname, 'fixtures', `${name}-deep-chain`);

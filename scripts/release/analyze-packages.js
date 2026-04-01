@@ -1,28 +1,16 @@
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-function toGitPath(filePath) {
-  return filePath.split(path.sep).join('/');
-}
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const RELEASE_CONFIG_PATH = path.resolve(__dirname, '../../release.config.js');
 
 function getGitRoot(cwd) {
   return execFileSync('git', ['rev-parse', '--show-toplevel'], {
     cwd,
     encoding: 'utf-8',
   }).trim();
-}
-
-function getChangedFiles(cwd, commitHash) {
-  const output = execFileSync('git', ['show', '--pretty=format:', '--name-only', commitHash], {
-    cwd,
-    encoding: 'utf-8',
-  });
-
-  return output
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
 }
 
 function getWorkspacePackages(cwd) {
@@ -47,7 +35,7 @@ function getWorkspacePackages(cwd) {
     }));
 }
 
-function findDependents(cwd, packageName, allPackages) {
+function findDependents(packageName, allPackages) {
   const dependents = [];
   for (const pkg of allPackages) {
     const deps = pkg.dependencies || {};
@@ -75,9 +63,34 @@ function findAllDependents(packageName, allPackages) {
   return dependents;
 }
 
+function readPackageName(cwd) {
+  const pkgRaw = fs.readFileSync(path.join(cwd, 'package.json'), 'utf-8');
+  const parsed = JSON.parse(pkgRaw);
+  const { name } = parsed;
+  if (typeof name !== 'string' || name.length === 0) {
+    throw new Error(`Missing package name in ${cwd}`);
+  }
+  return name;
+}
+
+function toGitPath(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+function getChangedFiles(cwd, commitHash) {
+  const output = execFileSync('git', ['show', '--pretty=format:', '--name-only', commitHash], {
+    cwd,
+    encoding: 'utf-8',
+  });
+
+  return output
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
 function getLastReleaseTag(cwd, packageName) {
-  const shortName = packageName.replace('@lockfile-affected/', '');
-  const tagPattern = `${shortName}-v*`;
+  const tagPattern = `${packageName}-v*`;
   try {
     const output = execFileSync(
       'git',
@@ -95,17 +108,17 @@ function getLastReleaseTag(cwd, packageName) {
 
 function getCommitsSinceTag(cwd, tag) {
   if (!tag) {
-    const output = execFileSync('git', ['log', '--oneline', '-n', '50'], {
+    return [];
+  }
+  try {
+    const output = execFileSync('git', ['log', `${tag}..HEAD`, '--oneline'], {
       cwd,
       encoding: 'utf-8',
     });
     return output.split('\n').filter(Boolean);
+  } catch {
+    return [];
   }
-  const output = execFileSync('git', ['log', `${tag}..HEAD`, '--oneline'], {
-    cwd,
-    encoding: 'utf-8',
-  });
-  return output.split('\n').filter(Boolean);
 }
 
 function analyzeCommitsForPackage(gitRoot, packagePath, commits) {
@@ -126,41 +139,53 @@ function analyzeCommitsForPackage(gitRoot, packagePath, commits) {
   return packageCommitHashes;
 }
 
-export async function analyzeReleases(cwd = process.cwd()) {
+function checkPackageHasChanges(cwd, packageInfo) {
   const gitRoot = getGitRoot(cwd);
-  const workspacePackages = getWorkspacePackages(cwd);
-  const allCommits = getCommitsSinceTag(cwd, null);
+  const packageName = readPackageName(packageInfo.path);
+  const packagePath = toGitPath(path.relative(gitRoot, packageInfo.path));
 
-  const packagesWithDirectChanges = new Set();
-  const packageDetails = new Map();
+  const lastTag = getLastReleaseTag(gitRoot, packageName);
+  const commits = getCommitsSinceTag(gitRoot, lastTag);
+
+  if (commits.length === 0) {
+    return { hasChanges: false, commits: [] };
+  }
+
+  const commitHashes = analyzeCommitsForPackage(gitRoot, packagePath, commits);
+
+  return {
+    hasChanges: commitHashes.size > 0,
+    commits: [...commitHashes],
+    lastTag,
+  };
+}
+
+async function analyzeReleases(cwd = process.cwd()) {
+  const workspacePackages = getWorkspacePackages(cwd);
+  const packagesWithChanges = new Map();
 
   for (const pkg of workspacePackages) {
-    const packagePath = toGitPath(path.relative(gitRoot, pkg.path));
-    const commitHashes = analyzeCommitsForPackage(gitRoot, packagePath, allCommits);
+    const result = checkPackageHasChanges(cwd, pkg);
 
-    if (commitHashes.size > 0) {
-      packagesWithDirectChanges.add(pkg.name);
-      packageDetails.set(pkg.name, {
+    if (result.hasChanges) {
+      packagesWithChanges.set(pkg.name, {
         ...pkg,
-        commitHashes: [...commitHashes],
         reason: 'direct changes',
+        commits: result.commits,
       });
     }
   }
 
-  const packagesToRelease = new Set(packagesWithDirectChanges);
-  const dependentsToRelease = new Map();
+  const packagesToRelease = new Set([...packagesWithChanges.keys()]);
 
-  for (const packageName of packagesWithDirectChanges) {
+  for (const packageName of packagesWithChanges.keys()) {
     const allDependents = findAllDependents(packageName, workspacePackages);
 
     for (const dependent of allDependents) {
       if (!packagesToRelease.has(dependent)) {
         packagesToRelease.add(dependent);
-        dependentsToRelease.set(dependent, packageName);
-        packageDetails.set(dependent, {
+        packagesWithChanges.set(dependent, {
           ...workspacePackages.find((p) => p.name === dependent),
-          commitHashes: [],
           reason: `dependency update (${packageName})`,
         });
       }
@@ -173,8 +198,7 @@ export async function analyzeReleases(cwd = process.cwd()) {
   });
 
   return {
-    packages: sortedPackages.map((name) => packageDetails.get(name)),
-    totalCommits: allCommits.length,
+    packages: sortedPackages.map((name) => packagesWithChanges.get(name)),
   };
 }
 
@@ -208,7 +232,7 @@ function topologicalSort(packages, getDependencies) {
   return result;
 }
 
-export function formatReleasePlan(analysisResult) {
+function formatReleasePlan(analysisResult) {
   const lines = ['## 📋 Release Plan', ''];
 
   if (analysisResult.packages.length === 0) {

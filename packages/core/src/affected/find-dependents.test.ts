@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allDependencyTypes, type WorkspaceGraph } from '../types/lockfile.js';
+import { allDependencyTypesEnabled, type WorkspaceGraph } from '../types/lockfile.js';
 import { findDependents } from './find-dependents.js';
 
 const pkgWith = (
@@ -49,7 +49,7 @@ describe('findDependents', () => {
       ['lib', { name: 'lib', dependencyGroups: pkgWith({ dependencies: ['vitest'] }) }],
     ]);
 
-    const dependents = findDependents('vitest', workspace, allDependencyTypes);
+    const dependents = findDependents('vitest', workspace, allDependencyTypesEnabled);
 
     expect(dependents.size).toBe(2);
     expect(dependents.has('app')).toBe(true);

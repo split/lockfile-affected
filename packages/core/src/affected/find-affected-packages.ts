@@ -1,5 +1,5 @@
 import {
-  allDependencyTypes,
+  allDependencyTypesEnabled,
   type DependencyFilter,
   type LockfileParser,
 } from '../types/lockfile.js';
@@ -19,6 +19,8 @@ export type FindAffectedOptions = {
   readonly workspaceRoot: string;
   /** Which dependency types to consider. When omitted, all types are included. */
   readonly filter?: DependencyFilter;
+  /** When enabled, root dependency changes affect all workspace packages */
+  readonly rootDepsAffectAll?: boolean;
 };
 
 /**
@@ -35,6 +37,20 @@ export async function findAffectedPackages(
   ]);
 
   const diff = diffLockfileSnapshots(snapshotBefore, snapshotAfter);
-  const workspaceGraph = buildWorkspaceGraph(manifests);
-  return resolveAffectedPackages(diff, workspaceGraph, options.filter ?? allDependencyTypes);
+  const workspaceGraph = buildWorkspaceGraph(manifests, snapshotAfter);
+
+  if (options.rootDepsAffectAll) {
+    const resolveOptions = {
+      rootDepsAffectAll: true,
+      rootContext: diff.changed.has('.'),
+    };
+    return resolveAffectedPackages(
+      diff,
+      workspaceGraph,
+      options.filter ?? allDependencyTypesEnabled,
+      resolveOptions,
+    );
+  }
+
+  return resolveAffectedPackages(diff, workspaceGraph, options.filter ?? allDependencyTypesEnabled);
 }

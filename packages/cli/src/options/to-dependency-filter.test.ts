@@ -12,16 +12,17 @@ const base: CliOptions = {
   dev: false,
   peer: false,
   optional: false,
+  rootDepsAffectAll: false,
 };
 
 describe('toDependencyFilter', () => {
-  it('returns all types when no flags are set', () => {
+  it('returns all false when no flags are set', () => {
     const filter = toDependencyFilter(base);
 
-    expect(filter.dependencies).toBe(true);
-    expect(filter.devDependencies).toBe(true);
-    expect(filter.peerDependencies).toBe(true);
-    expect(filter.optionalDependencies).toBe(true);
+    expect(filter.dependencies).toBe(false);
+    expect(filter.devDependencies).toBe(false);
+    expect(filter.peerDependencies).toBe(false);
+    expect(filter.optionalDependencies).toBe(false);
   });
 
   it('returns only deps when only --deps is set', () => {

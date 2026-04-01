@@ -5,15 +5,24 @@ import type {
   WorkspaceGraph,
 } from '../types/lockfile.js';
 import { findDependents } from './find-dependents.js';
+import { allDependencyTypes } from '../types/lockfile.js';
 
 export function resolveAffectedPackages(
   diff: LockfileDiff,
   workspace: WorkspaceGraph,
   filter: DependencyFilter,
+  options?: {
+    readonly rootDepsAffectAll?: boolean;
+    readonly rootContext?: boolean;
+  },
 ): ReadonlySet<string> {
   const changedNames = collectChangedDependencyNames(diff);
 
   if (changedNames.size === 0) {
+    return new Set();
+  }
+
+  if (options?.rootDepsAffectAll && isEmptyFilter(filter)) {
     return new Set();
   }
 
@@ -28,6 +37,22 @@ export function resolveAffectedPackages(
   for (const [packageName, pkg] of workspace) {
     if (isAffected(pkg.dependencyGroups, changedNames, filter)) {
       directlyAffected.add(packageName);
+    }
+  }
+
+  if (options?.rootDepsAffectAll && options?.rootContext) {
+    const rootChanged = hasRootChanged(diff);
+    if (rootChanged && hasFilterOverlap(filter)) {
+      const rootChangedNames = getRootChangedNames(diff);
+      for (const [packageName, pkg] of workspace) {
+        for (const depType of allDependencyTypes) {
+          if (!filter[depType]) continue;
+          if (hasOverlap(pkg.dependencyGroups[depType], rootChangedNames)) {
+            directlyAffected.add(packageName);
+            break;
+          }
+        }
+      }
     }
   }
 
@@ -87,4 +112,52 @@ function hasOverlap(deps: ReadonlySet<string>, changedNames: ReadonlySet<string>
     if (changedNames.has(dep)) return true;
   }
   return false;
+}
+
+function hasRootChanged(diff: LockfileDiff): boolean {
+  if (diff.changed.has('.')) return true;
+  if (diff.addedContexts.has('.')) return true;
+  if (diff.removedContexts.has('.')) return true;
+  return false;
+}
+
+function hasFilterOverlap(filter: DependencyFilter): boolean {
+  return Boolean(
+    filter.dependencies ||
+    filter.devDependencies ||
+    filter.peerDependencies ||
+    filter.optionalDependencies,
+  );
+}
+
+function isEmptyFilter(filter: DependencyFilter): boolean {
+  return (
+    !filter.dependencies &&
+    !filter.devDependencies &&
+    !filter.peerDependencies &&
+    !filter.optionalDependencies
+  );
+}
+
+function getRootChangedNames(diff: LockfileDiff): ReadonlySet<string> {
+  const names = new Set<string>();
+
+  const rootDiff = diff.changed.get('.');
+  if (rootDiff) {
+    for (const name of rootDiff.added.keys()) names.add(name);
+    for (const name of rootDiff.removed.keys()) names.add(name);
+    for (const name of rootDiff.changed.keys()) names.add(name);
+  }
+
+  const rootAdded = diff.addedContexts.get('.');
+  if (rootAdded) {
+    for (const name of rootAdded.keys()) names.add(name);
+  }
+
+  const rootRemoved = diff.removedContexts.get('.');
+  if (rootRemoved) {
+    for (const name of rootRemoved.keys()) names.add(name);
+  }
+
+  return names;
 }

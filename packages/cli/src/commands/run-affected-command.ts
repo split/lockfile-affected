@@ -1,4 +1,9 @@
-import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
+import {
+  detectLockfile,
+  findAffectedPackages,
+  type LockfileParser,
+  type DependencyFilter,
+} from '@lockfile-affected/core';
 import {
   isSupportedFormat,
   lockfileParsers,
@@ -32,13 +37,20 @@ export async function runAffectedCommand(options: CliOptions): Promise<string> {
   ]);
 
   const filter = toDependencyFilter(options);
-  const affected = await findAffectedPackages({
+  const hasFilter =
+    filter.dependencies ||
+    filter.devDependencies ||
+    filter.peerDependencies ||
+    filter.optionalDependencies;
+  const findOptions = {
     beforeContent,
     afterContent,
     parser,
     workspaceRoot: options.workspaceRoot,
-    filter,
-  });
+    ...(hasFilter && { filter }),
+    ...(options.rootDepsAffectAll && { rootDepsAffectAll: true }),
+  };
+  const affected = await findAffectedPackages(findOptions);
 
   const sortedAffected = Array.from(affected).sort();
   return formatAffectedOutput(sortedAffected, options.output);

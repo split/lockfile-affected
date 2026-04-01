@@ -24,4 +24,6 @@ export type CliOptions = {
   readonly dev: boolean;
   readonly peer: boolean;
   readonly optional: boolean;
+  /** When enabled, root dependency changes affect all workspace packages */
+  readonly rootDepsAffectAll?: boolean;
 };

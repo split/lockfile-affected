@@ -59,13 +59,21 @@ export type DependencyFilter = {
   readonly optionalDependencies?: boolean;
 };
 
-/** A DependencyFilter that includes all dependency types. */
-export const allDependencyTypes: DependencyFilter = {
+export const allDependencyTypes = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
+] satisfies (keyof DependencyFilter)[];
+
+export type DependencyTypeKey = (typeof allDependencyTypes)[number];
+
+export const allDependencyTypesEnabled = {
   dependencies: true,
   devDependencies: true,
   peerDependencies: true,
   optionalDependencies: true,
-};
+} satisfies DependencyFilter;
 
 /**
  * Represents a single package in the workspace (monorepo member).

@@ -1,0 +1,31 @@
+lockfileVersion: '9.0'
+
+metadata:
+  packageManager: pnpm@9.15.9
+
+importers:
+  .:
+    dependencies:
+      lodash:
+        specifier: ^4.17.0
+        version: 4.17.21
+    devDependencies:
+      vitest:
+        specifier: ^1.0.0
+        version: 1.0.0
+  packages/pkg-a:
+    dependencies: {}
+
+packages:
+  lodash@4.17.21:
+    resolution:
+      {
+        integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4sLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZbet2yk9dzQ1uFR5/0w==,
+      }
+
+  vitest@1.0.0:
+    resolution: { integrity: sha512-dummy }
+
+snapshots:
+  lodash@4.17.21: {}
+  vitest@1.0.0: {}

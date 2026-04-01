@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import type { PackageManifest } from './build-workspace-graph.js';
 import { buildWorkspaceGraph } from './build-workspace-graph.js';
 
 describe('buildWorkspaceGraph', () => {
-  it('builds a graph from package.json manifests', () => {
-    const manifests = [
+  it('builds a graph from package.json manifests', async () => {
+    const manifests: PackageManifest[] = [
       {
         name: 'app',
         dependencies: { lodash: '^4.0.0' },
@@ -16,7 +17,7 @@ describe('buildWorkspaceGraph', () => {
       },
     ];
 
-    const graph = buildWorkspaceGraph(manifests);
+    const graph = await buildWorkspaceGraph(manifests);
 
     expect(graph.size).toBe(2);
 
@@ -30,10 +31,10 @@ describe('buildWorkspaceGraph', () => {
     expect(utils?.dependencyGroups.peerDependencies.has('react')).toBe(true);
   });
 
-  it('handles packages with no dependencies', () => {
-    const manifests = [{ name: 'empty-pkg' }];
+  it('handles packages with no dependencies', async () => {
+    const manifests: PackageManifest[] = [{ name: 'empty-pkg' }];
 
-    const graph = buildWorkspaceGraph(manifests);
+    const graph = await buildWorkspaceGraph(manifests);
 
     const pkg = graph.get('empty-pkg');
     expect(pkg).toBeDefined();
@@ -43,20 +44,20 @@ describe('buildWorkspaceGraph', () => {
     expect(pkg?.dependencyGroups.optionalDependencies.size).toBe(0);
   });
 
-  it('skips manifests without a name', () => {
-    const manifests = [
+  it('skips manifests without a name', async () => {
+    const manifests: PackageManifest[] = [
       { dependencies: { lodash: '4.0.0' } },
       { name: 'valid-pkg', dependencies: { react: '18.0.0' } },
     ];
 
-    const graph = buildWorkspaceGraph(manifests);
+    const graph = await buildWorkspaceGraph(manifests);
 
     expect(graph.size).toBe(1);
     expect(graph.has('valid-pkg')).toBe(true);
   });
 
-  it('keeps each dependency type in its own group', () => {
-    const manifests = [
+  it('keeps each dependency type in its own group', async () => {
+    const manifests: PackageManifest[] = [
       {
         name: 'full-pkg',
         dependencies: { a: '1.0.0' },
@@ -66,7 +67,7 @@ describe('buildWorkspaceGraph', () => {
       },
     ];
 
-    const graph = buildWorkspaceGraph(manifests);
+    const graph = await buildWorkspaceGraph(manifests);
 
     const pkg = graph.get('full-pkg');
     expect(pkg?.dependencyGroups.dependencies.has('a')).toBe(true);

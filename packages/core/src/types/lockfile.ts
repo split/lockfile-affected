@@ -97,7 +97,9 @@ export type LockfileParser = {
   /** Human-readable name for this format, e.g. "pnpm" */
   readonly format: string;
   /** Filenames this parser handles, e.g. ["pnpm-lock.yaml"] */
-  readonly lockfileNames: readonly string[];
+  readonly lockfileNames?: readonly string[];
+  /** Detect if this parser can handle the given lockfile content */
+  readonly detect: (content: string) => boolean;
   /** Parse raw lockfile content into a normalized snapshot */
   readonly parse: (content: string) => Promise<LockfileSnapshot>;
 };

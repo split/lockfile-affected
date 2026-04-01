@@ -1,5 +1,3 @@
-import { access } from 'node:fs/promises';
-import { join } from 'node:path';
 import type { LockfileParser } from '../types/lockfile.js';
 
 export type DetectedLockfile = {
@@ -8,28 +6,19 @@ export type DetectedLockfile = {
 };
 
 /**
- * Finds the first known lockfile in `dir` by checking each parser's `lockfileNames`.
- * Returns the absolute path and the format name from the matching parser.
- * Throws if no lockfile is found.
- *
- * Supports: pnpm, npm, yarn, and bun lockfile formats.
+ * Detects the lockfile format from content by trying each parser's detect method.
+ * Returns the format name from the matching parser.
+ * Throws if no format can be detected.
  */
-export async function detectLockfile(
-  dir: string,
-  parsers: readonly LockfileParser[],
-): Promise<DetectedLockfile> {
+export function detectLockfile(content: string, parsers: readonly LockfileParser[]): string {
   for (const parser of parsers) {
-    for (const filename of parser.lockfileNames) {
-      const fullPath = join(dir, filename);
-      try {
-        await access(fullPath);
-        return { path: fullPath, format: parser.format };
-      } catch {
-        // not found, try next
-      }
+    if (parser.detect(content)) {
+      return parser.format;
     }
   }
 
-  const allNames = parsers.flatMap((p) => p.lockfileNames);
-  throw new Error(`No lockfile found in ${dir}. Expected one of: ${allNames.join(', ')}`);
+  const availableFormats = parsers.map((p) => p.format);
+  throw new Error(
+    `Unable to detect lockfile format. Available formats: ${availableFormats.join(', ')}`,
+  );
 }

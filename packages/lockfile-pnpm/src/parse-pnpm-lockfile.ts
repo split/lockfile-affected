@@ -52,8 +52,13 @@ function toSnapshot(lockfile: PnpmLockfile): LockfileSnapshot {
   return snapshot;
 }
 
+export function detectPnpmLockfile(content: string): boolean {
+  return content.includes('importers:');
+}
+
 export const pnpmLockfileParser: LockfileParser = {
   format: 'pnpm',
   lockfileNames: ['pnpm-lock.yaml'],
+  detect: detectPnpmLockfile,
   parse: parsePnpmLockfile,
 };

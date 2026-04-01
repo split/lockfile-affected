@@ -1,103 +1,82 @@
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
-import { randomBytes } from 'node:crypto';
-import { beforeEach, describe, expect, it } from 'vitest';
-import type { LockfileParser, LockfileSnapshot } from '../types/lockfile.js';
+import { describe, expect, it } from 'vitest';
 import { findAffectedPackages } from './find-affected-packages.js';
 
-function makeTempDir(): string {
-  return join(tmpdir(), `find-affected-test-${randomBytes(6).toString('hex')}`);
+function makeSnapshot(...entries: string[]): Map<string, ReadonlyMap<string, string>> {
+  const snapshot = new Map<string, ReadonlyMap<string, string>>();
+  const rootPackages = new Map<string, string>();
+  for (const entry of entries) {
+    const [name, version] = entry.split('@');
+    if (name && version) rootPackages.set(name, version);
+  }
+  snapshot.set('.', rootPackages);
+  return snapshot;
 }
 
-/** A fake parser that treats content as newline-separated "name@version" pairs. */
-function makeParser(): LockfileParser {
-  return {
-    format: 'fake',
-    lockfileNames: ['fake.lock'],
-    parse: async (content: string): Promise<LockfileSnapshot> => {
-      const snapshot = new Map<string, ReadonlyMap<string, string>>();
-      const rootPackages = new Map<string, string>();
-      for (const line of content.split('\n').filter(Boolean)) {
-        const [name, version] = line.split('@');
-        if (name && version) rootPackages.set(name, version);
-      }
-      snapshot.set('.', rootPackages);
-      return snapshot;
-    },
-  };
-}
-
-function lockfile(...entries: string[]): string {
-  return entries.join('\n');
+function makeManifests(
+  ...manifests: { name: string; deps?: Record<string, string>; devDeps?: Record<string, string> }[]
+) {
+  return manifests.map((m) => ({
+    name: m.name,
+    dependencies: m.deps,
+    devDependencies: m.devDeps,
+    peerDependencies: undefined,
+    optionalDependencies: undefined,
+  }));
 }
 
 describe('findAffectedPackages', () => {
-  let dir: string;
+  it('returns empty set when no packages depend on changed deps', () => {
+    const snapshotBefore = makeSnapshot('react@18.0.0');
+    const snapshotAfter = makeSnapshot('react@18.1.0');
+    const manifests = makeManifests({ name: 'pkg-a', deps: { lodash: '^4.0.0' } });
 
-  beforeEach(async () => {
-    dir = makeTempDir();
-    await mkdir(dir, { recursive: true });
-  });
-
-  it('returns empty set when no packages depend on changed deps', async () => {
-    await mkdir(join(dir, 'packages', 'pkg-a'), { recursive: true });
-    await writeFile(
-      join(dir, 'packages', 'pkg-a', 'package.json'),
-      JSON.stringify({ name: 'pkg-a', dependencies: { lodash: '^4.0.0' } }),
-    );
-
-    const result = await findAffectedPackages({
-      beforeContent: lockfile('react@18.0.0'),
-      afterContent: lockfile('react@18.1.0'),
-      parser: makeParser(),
-      workspaceRoot: dir,
+    const result = findAffectedPackages({
+      snapshotBefore,
+      snapshotAfter,
+      manifests,
     });
 
     expect(result.size).toBe(0);
   });
 
-  it('returns packages that depend on a changed dep', async () => {
-    await mkdir(join(dir, 'packages', 'pkg-a'), { recursive: true });
-    await writeFile(
-      join(dir, 'packages', 'pkg-a', 'package.json'),
-      JSON.stringify({ name: 'pkg-a', dependencies: { react: '^18.0.0' } }),
-    );
+  it('returns packages that depend on a changed dep', () => {
+    const snapshotBefore = makeSnapshot('react@18.0.0');
+    const snapshotAfter = makeSnapshot('react@18.1.0');
+    const manifests = makeManifests({ name: 'pkg-a', deps: { react: '^18.0.0' } });
 
-    const result = await findAffectedPackages({
-      beforeContent: lockfile('react@18.0.0'),
-      afterContent: lockfile('react@18.1.0'),
-      parser: makeParser(),
-      workspaceRoot: dir,
+    const result = findAffectedPackages({
+      snapshotBefore,
+      snapshotAfter,
+      manifests,
     });
 
     expect(result).toContain('pkg-a');
   });
 
-  it('respects the dependency filter', async () => {
-    await mkdir(join(dir, 'packages', 'pkg-a'), { recursive: true });
-    await writeFile(
-      join(dir, 'packages', 'pkg-a', 'package.json'),
-      JSON.stringify({ name: 'pkg-a', devDependencies: { react: '^18.0.0' } }),
-    );
+  it('respects the dependency filter', () => {
+    const snapshotBefore = makeSnapshot('react@18.0.0');
+    const snapshotAfter = makeSnapshot('react@18.1.0');
+    const manifests = makeManifests({ name: 'pkg-a', devDeps: { react: '^18.0.0' } });
 
-    const result = await findAffectedPackages({
-      beforeContent: lockfile('react@18.0.0'),
-      afterContent: lockfile('react@18.1.0'),
-      parser: makeParser(),
-      workspaceRoot: dir,
-      filter: { dependencies: true }, // only prod deps — devDeps excluded
+    const result = findAffectedPackages({
+      snapshotBefore,
+      snapshotAfter,
+      manifests,
+      filter: { dependencies: true },
     });
 
     expect(result.size).toBe(0);
   });
 
-  it('returns a ReadonlySet', async () => {
-    const result = await findAffectedPackages({
-      beforeContent: lockfile('react@18.0.0'),
-      afterContent: lockfile('react@18.0.0'),
-      parser: makeParser(),
-      workspaceRoot: dir,
+  it('returns a ReadonlySet', () => {
+    const snapshotBefore = makeSnapshot('react@18.0.0');
+    const snapshotAfter = makeSnapshot('react@18.0.0');
+    const manifests: { name: string }[] = [];
+
+    const result = findAffectedPackages({
+      snapshotBefore,
+      snapshotAfter,
+      manifests,
     });
 
     expect(result).toBeInstanceOf(Set);

@@ -1,6 +1,15 @@
 import type { LockfileParser, LockfileSnapshot } from '@lockfile-affected/core';
 import YAML from 'yaml';
 
+export function detectYarnLockfile(content: string): boolean {
+  try {
+    const parsed: unknown = YAML.parse(content);
+    return typeof parsed === 'object' && parsed !== null && '__metadata' in parsed;
+  } catch {
+    return false;
+  }
+}
+
 export function parseYarnLockfile(content: string): Promise<LockfileSnapshot> {
   const parsed = YAML.parse(content) as Record<string, unknown>;
   return Promise.resolve(toSnapshot(parsed));
@@ -102,5 +111,6 @@ function extractPackageName(key: string): string {
 export const yarnLockfileParser: LockfileParser = {
   format: 'yarn',
   lockfileNames: ['yarn.lock'],
+  detect: detectYarnLockfile,
   parse: parseYarnLockfile,
 };

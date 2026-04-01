@@ -62,8 +62,13 @@ function extractVersion(nameAtVersion: string | undefined): string | undefined {
   return atIndex === -1 ? nameAtVersion : nameAtVersion.slice(atIndex + 1);
 }
 
+export function detectBunLockfile(content: string): boolean {
+  return content.includes('workspaces') && content.includes('packages');
+}
+
 export const bunLockfileParser: LockfileParser = {
   format: 'bun',
   lockfileNames: ['bun.lock'],
+  detect: detectBunLockfile,
   parse: parseBunLockfile,
 };

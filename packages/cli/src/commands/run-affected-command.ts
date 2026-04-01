@@ -1,4 +1,8 @@
-import { detectLockfile, findAffectedPackages } from '@lockfile-affected/core';
+import {
+  detectLockfile,
+  findAffectedPackages,
+  loadWorkspaceManifests,
+} from '@lockfile-affected/core';
 import {
   isSupportedFormat,
   lockfileParsers,
@@ -11,14 +15,20 @@ import { readLockfileContent } from './read-lockfile-content.js';
 
 /**
  * Runs the full affected-packages resolution pipeline:
- * 1. Detect or resolve the lockfile parser
- * 2. Read both lockfile snapshots
- * 3. Delegate to findAffectedPackages (core)
- * 4. Format and return output
+ * 1. Read both lockfiles
+ * 2. Detect format from content (or use --format flag)
+ * 3. Parse lockfile content into snapshots
+ * 4. Build workspace graph from manifests
+ * 5. Resolve affected packages
+ * 6. Format output
  */
 export async function runAffectedCommand(options: CliOptions): Promise<string> {
-  const format =
-    options.format ?? (await detectLockfile(options.workspaceRoot, lockfileParsers)).format;
+  const [beforeContent, afterContent] = await Promise.all([
+    readLockfileContent(options.lockfileBefore),
+    readLockfileContent(options.lockfileAfter),
+  ]);
+
+  const format = options.format ?? detectLockfile(beforeContent, lockfileParsers);
 
   if (!isSupportedFormat(format)) {
     throw new Error(`No parser registered for format: ${format}`);
@@ -26,26 +36,23 @@ export async function runAffectedCommand(options: CliOptions): Promise<string> {
 
   const parser = lockfileParsersByFormat[format];
 
-  const [beforeContent, afterContent] = await Promise.all([
-    readLockfileContent(options.lockfileBefore),
-    readLockfileContent(options.lockfileAfter),
+  const [snapshotBefore, snapshotAfter, manifests] = await Promise.all([
+    parser.parse(beforeContent),
+    parser.parse(afterContent),
+    loadWorkspaceManifests(options.workspaceRoot),
   ]);
 
   const filter = toDependencyFilter(options);
-  const hasFilter =
-    filter.dependencies ||
-    filter.devDependencies ||
-    filter.peerDependencies ||
-    filter.optionalDependencies;
-  const findOptions = {
-    beforeContent,
-    afterContent,
-    parser,
-    workspaceRoot: options.workspaceRoot,
-    ...(hasFilter && { filter }),
+  const affected = findAffectedPackages({
+    snapshotBefore,
+    snapshotAfter,
+    manifests,
+    ...((filter.dependencies ||
+      filter.devDependencies ||
+      filter.peerDependencies ||
+      filter.optionalDependencies) && { filter }),
     ...(options.rootDepsAffectAll && { rootDepsAffectAll: true }),
-  };
-  const affected = await findAffectedPackages(findOptions);
+  });
 
   const sortedAffected = Array.from(affected).sort();
   return formatAffectedOutput(sortedAffected, options.output);

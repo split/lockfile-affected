@@ -95,8 +95,18 @@ function getDependencyKeys(context: string, packages: Record<string, NpmPackageE
   return keys;
 }
 
+export function detectNpmLockfile(content: string): boolean {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    return typeof parsed === 'object' && parsed !== null && 'packages' in parsed;
+  } catch {
+    return false;
+  }
+}
+
 export const npmLockfileParser: LockfileParser = {
   format: 'npm',
   lockfileNames: ['package-lock.json'],
+  detect: detectNpmLockfile,
   parse: parseNpmLockfile,
 };

@@ -1,97 +1,92 @@
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
-import { randomBytes } from 'node:crypto';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { LockfileParser, LockfileSnapshot } from '../types/lockfile.js';
 import { detectLockfile } from './detect-lockfile.js';
 
-function makeTempDir(): string {
-  return join(tmpdir(), `detect-lockfile-test-${randomBytes(6).toString('hex')}`);
-}
-
-function makeParser(format: string, lockfileNames: readonly string[]): LockfileParser {
+function makeParser(format: string, detect: (content: string) => boolean): LockfileParser {
   return {
     format,
-    lockfileNames,
+    detect,
     parse: async (_content: string): Promise<LockfileSnapshot> => new Map(),
   };
 }
 
 describe('detectLockfile', () => {
-  let dir: string;
-
-  beforeEach(async () => {
-    dir = makeTempDir();
-    await mkdir(dir, { recursive: true });
-  });
-
-  it('detects a lockfile matching the first parser', async () => {
-    await writeFile(join(dir, 'pnpm-lock.yaml'), '');
+  it('detects pnpm lockfile content', () => {
+    const content = `
+importers:
+  .:
+    dependencies:
+      react: ^18.0.0
+`;
     const parsers = [
-      makeParser('pnpm', ['pnpm-lock.yaml']),
-      makeParser('npm', ['package-lock.json']),
+      makeParser('pnpm', (c) => c.includes('importers:')),
+      makeParser('npm', (c) => c.includes('"packages"')),
     ];
 
-    const result = await detectLockfile(dir, parsers);
+    const result = detectLockfile(content, parsers);
 
-    expect(result.format).toBe('pnpm');
-    expect(result.path).toBe(join(dir, 'pnpm-lock.yaml'));
+    expect(result).toBe('pnpm');
   });
 
-  it('detects a lockfile matching the second parser when first is absent', async () => {
-    await writeFile(join(dir, 'package-lock.json'), '');
+  it('detects npm lockfile content', () => {
+    const content = JSON.stringify({
+      name: 'test',
+      packages: {
+        'node_modules/react': { version: '18.0.0' },
+      },
+    });
     const parsers = [
-      makeParser('pnpm', ['pnpm-lock.yaml']),
-      makeParser('npm', ['package-lock.json']),
+      makeParser('pnpm', (c) => c.includes('importers:')),
+      makeParser('npm', (c) => c.includes('"packages"')),
     ];
 
-    const result = await detectLockfile(dir, parsers);
+    const result = detectLockfile(content, parsers);
 
-    expect(result.format).toBe('npm');
-    expect(result.path).toBe(join(dir, 'package-lock.json'));
+    expect(result).toBe('npm');
   });
 
-  it('prefers the first parser when multiple lockfiles exist', async () => {
-    await writeFile(join(dir, 'pnpm-lock.yaml'), '');
-    await writeFile(join(dir, 'package-lock.json'), '');
+  it('prefers the first parser when multiple match', () => {
+    const content = `
+importers:
+  .:
+    dependencies:
+      react: ^18.0.0
+`;
     const parsers = [
-      makeParser('pnpm', ['pnpm-lock.yaml']),
-      makeParser('npm', ['package-lock.json']),
+      makeParser('pnpm', (c) => c.includes('importers:')),
+      makeParser('npm', (c) => c.includes('importers:')),
     ];
 
-    const result = await detectLockfile(dir, parsers);
+    const result = detectLockfile(content, parsers);
 
-    expect(result.format).toBe('pnpm');
+    expect(result).toBe('pnpm');
   });
 
-  it('checks all lockfileNames within a parser', async () => {
-    await writeFile(join(dir, 'npm-shrinkwrap.json'), '');
-    const parsers = [makeParser('npm', ['package-lock.json', 'npm-shrinkwrap.json'])];
-
-    const result = await detectLockfile(dir, parsers);
-
-    expect(result.format).toBe('npm');
-    expect(result.path).toBe(join(dir, 'npm-shrinkwrap.json'));
-  });
-
-  it('throws when no lockfile is found', async () => {
+  it('throws when no parser matches', () => {
+    const content = 'some unknown format';
     const parsers = [
-      makeParser('pnpm', ['pnpm-lock.yaml']),
-      makeParser('npm', ['package-lock.json']),
+      makeParser('pnpm', (c) => c.includes('importers:')),
+      makeParser('npm', (c) => c.includes('"packages"')),
     ];
 
-    await expect(detectLockfile(dir, parsers)).rejects.toThrow(/No lockfile found/);
+    expect(() => detectLockfile(content, parsers)).toThrow(/Unable to detect lockfile format/);
   });
 
-  it('includes all candidate names in the error message', async () => {
+  it('includes available formats in error message', () => {
+    const content = 'unknown';
     const parsers = [
-      makeParser('pnpm', ['pnpm-lock.yaml']),
-      makeParser('npm', ['package-lock.json', 'npm-shrinkwrap.json']),
+      makeParser('pnpm', (c) => c.includes('importers:')),
+      makeParser('npm', (c) => c.includes('packages')),
+      makeParser('yarn', (c) => c.includes('metadata')),
     ];
 
-    await expect(detectLockfile(dir, parsers)).rejects.toThrow(
-      /pnpm-lock\.yaml.*package-lock\.json.*npm-shrinkwrap\.json/,
-    );
+    try {
+      detectLockfile(content, parsers);
+    } catch (e) {
+      const error = e as Error;
+      expect(error.message).toContain('pnpm');
+      expect(error.message).toContain('npm');
+      expect(error.message).toContain('yarn');
+    }
   });
 });

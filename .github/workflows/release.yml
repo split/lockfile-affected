@@ -49,7 +49,10 @@ jobs:
         run: |
           PLAN=$(node scripts/release/analyze-packages.js)
 
-          echo "$PLAN" >> $GITHUB_STEP_SUMMARY
+          {
+            echo ""
+            echo "$PLAN"
+          } >> $GITHUB_STEP_SUMMARY
 
           # Check if there are packages to release
           if echo "$PLAN" | grep -q "No packages need releasing"; then

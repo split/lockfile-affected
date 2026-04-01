@@ -45,11 +45,11 @@ jobs:
 
       - name: Analyze release plan
         id: analyze
+        shell: bash
         run: |
           PLAN=$(node scripts/release/analyze-packages.js)
 
           echo "$PLAN" >> $GITHUB_STEP_SUMMARY
-          echo "plan=$PLAN" >> $GITHUB_OUTPUT
 
           # Check if there are packages to release
           if echo "$PLAN" | grep -q "No packages need releasing"; then
